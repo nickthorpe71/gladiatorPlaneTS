@@ -1,4 +1,5 @@
 import express from "express";
+import { fork } from "child_process";
 import { createServer } from "http";
 import cors from "cors";
 import config from "config";
@@ -19,17 +20,22 @@ app.get("/", (_, res) =>
   res.send(`Server is up and running version ${version}`)
 );
 
-app.get("/isprime", (req, res) => {
+app.get("/isPrime", (req, res) => {
   const incomingNumber = Number(req.query.number);
   logger.info(
     `Request made to check if ${incomingNumber} is prime at ${new Date().toLocaleString()}`
   );
 
-  const jsonResponse = isPrime(incomingNumber);
-  logger.info(`Request completed at ${new Date().toLocaleString()}`);
-  logger.info(`Response: ${JSON.stringify(jsonResponse)}`);
+  // process incoming request on its own child process
+  const childProcess = fork("src/experiments/parallelism/isPrime.ts");
+  childProcess.send({ number: incomingNumber });
 
-  res.send(jsonResponse);
+  // listen for child process to send message with result from isPrime
+  childProcess.on("message", (message) => {
+    logger.info(`Request completed at ${new Date().toLocaleString()}`);
+    logger.info(`Response: ${JSON.stringify(message)}`);
+    res.send(message);
+  });
 });
 
 httpServer.listen(port, host, () => {
