@@ -1,4 +1,4 @@
-import nameGen from "../nameGen";
+import nameGen from "../utils/nameGen";
 import { randInt } from "../utils";
 
 function createWarrior() {
