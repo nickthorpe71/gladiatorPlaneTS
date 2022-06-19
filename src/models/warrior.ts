@@ -1,5 +1,5 @@
-const nameGen = require("./nameGen");
-const { randInt } = require("./utils");
+import nameGen from "../nameGen";
+import { randInt } from "../utils";
 
 function createWarrior() {
     const firstName = nameGen(2, 7);
