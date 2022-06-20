@@ -19,6 +19,7 @@
 [ ] reimplement database
 [ ] track the progress of the stats and brain of a warrior as they evolve
 [ ] create UI
+[ ] ultimately warriors should try to predict what their opponent will do
 
 [ ] EDGE CASES
 [ ] when both warriors attack, the one who goes first should be the one with highest speed
