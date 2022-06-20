@@ -1,7 +1,35 @@
 import nameGen from "../utils/nameGen";
 import { randInt, randFloat } from "../utils";
 
-export default function createWarrior() {
+interface Warrior {
+  firstName: string;
+  lastName: string;
+  nickname: string;
+  age: number;
+  weight: number;
+  mutationFactor: number;
+  alive: boolean;
+  kills: number;
+  wins: number;
+  losses: number;
+  totalDamageDone: number;
+  ambition: number;
+  intelligence: number;
+  maxHealth: number;
+  maxEndurance: number;
+  enduranceFactor: number;
+  flexibility: number;
+  strength: number;
+  accuracy: number;
+  dexterity: number;
+  reflex: number;
+  height: number;
+  speed: number;
+  power: number;
+  toughness: number;
+}
+
+export default function createWarrior(): Warrior {
   const firstName = nameGen(2, 7);
   const lastName = nameGen(3, 10);
   const nickname = nameGen(3, 10);
@@ -70,5 +98,3 @@ export default function createWarrior() {
     toughness,
   };
 }
-
-console.log(createWarrior());
