@@ -6,6 +6,7 @@ export interface Warrior {
   lastName: string;
   nickname: string;
   age: number;
+  height: number;
   weight: number;
   mutationFactor: number;
   alive: boolean;
@@ -23,7 +24,6 @@ export interface Warrior {
   accuracy: number;
   dexterity: number;
   reflex: number;
-  height: number;
   speed: number;
   power: number;
   toughness: number;

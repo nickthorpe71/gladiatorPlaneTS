@@ -12,6 +12,9 @@ const corsOrigin = config.get<string>("corsOrigin");
 
 const app = express();
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
 const httpServer = createServer(app);
 
 app.get("/", (_, res) =>
@@ -37,6 +40,7 @@ app.get("/isPrime", (req, res) => {
 });
 
 httpServer.listen(port, host, () => {
-  logger.info(`Server version ${version} is listening`);
-  logger.info(`http://${host}:${port}`);
+  logger.info(
+    `Server version ${version} is listening at http://${host}:${port}`
+  );
 });

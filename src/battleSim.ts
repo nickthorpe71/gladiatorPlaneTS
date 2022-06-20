@@ -1,4 +1,4 @@
-import { Warrior } from "./models/warrior";
+import { Warrior } from "./model/warrior";
 
 export default function runBattleSim(
   warrior1: Warrior,
@@ -39,7 +39,6 @@ function initWarriorBattleStats(warrior: Warrior): WarriorBattleStats {
     numberOfHits: 0,
     numberOfMisses: 0,
     numberOfCrits: 0,
-    score: 0,
   };
 }
 
@@ -70,5 +69,4 @@ interface WarriorBattleStats {
   numberOfHits: number;
   numberOfMisses: number;
   numberOfCrits: number;
-  score: number;
 }
