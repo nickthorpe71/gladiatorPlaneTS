@@ -1,7 +1,7 @@
 import nameGen from "../utils/nameGen";
 import { randInt, randFloat } from "../utils";
 
-interface Warrior {
+export interface Warrior {
   firstName: string;
   lastName: string;
   nickname: string;

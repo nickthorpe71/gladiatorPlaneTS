@@ -6,8 +6,6 @@ import config from "config";
 import logger from "./utils/logger";
 import { version } from "../package.json";
 
-import isPrime from "./experiments/parallelism/isPrime";
-
 const port = config.get<number>("port");
 const host = config.get<string>("host");
 const corsOrigin = config.get<string>("corsOrigin");
