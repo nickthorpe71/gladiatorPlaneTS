@@ -7,6 +7,7 @@ import logger from "./utils/logger";
 import { version } from "../package.json";
 import connectDatabase from "./db/connect";
 import initializeRoutes from "./routes";
+import { deserializeUser } from "./middleware";
 
 const port = config.get<number>("port");
 const host = config.get<string>("host");
@@ -14,6 +15,7 @@ const corsOrigin = config.get<string>("corsOrigin");
 
 const app = express();
 
+app.use(deserializeUser);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
