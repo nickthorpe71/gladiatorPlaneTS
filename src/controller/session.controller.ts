@@ -5,6 +5,7 @@ import {
   createAccessToken,
   createSession,
   updateSession,
+  findSessions,
 } from "../service/session.service";
 import { validatePassword } from "../service/user.service";
 import { sign } from "../utils/jwt.utils";
@@ -36,4 +37,12 @@ export async function invalidateUserSessionHandler(
   await updateSession({ _id: sessionId }, { valid: false });
 
   return res.sendStatus(200);
+}
+
+export async function getUserSessionsHandler(req: Request, res: Response) {
+  const userId = get(req, "user._id");
+
+  const sessions = await findSessions({ user: userId, valid: true });
+
+  return res.send(sessions);
 }

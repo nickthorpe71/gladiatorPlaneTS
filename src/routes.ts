@@ -4,6 +4,7 @@ import { createUserSchema } from "./schema/user.schema";
 import {
   createUserSessionHandler,
   invalidateUserSessionHandler,
+  getUserSessionsHandler,
 } from "./controller/session.controller";
 import { createSessionSchema } from "./schema/session.schema";
 import { validateRequest, requiresUser } from "./middleware";
@@ -24,7 +25,7 @@ export default function initializeRoutes(app: Express) {
   );
 
   // Get user's sessions
-  // GET /api/sessions
+  app.get("/api/sessions", requiresUser, getUserSessionsHandler);
 
   // Logout
   app.delete("/api/sessions", requiresUser, invalidateUserSessionHandler);
