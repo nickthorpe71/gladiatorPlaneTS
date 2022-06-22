@@ -1,7 +1,9 @@
 import { Express, Request, Response } from "express";
-import { createUserHandler } from "./controller/user.controller";
 import validateRequest from "./middleware/validateRequest";
+import { createUserHandler } from "./controller/user.controller";
 import { createUserSchema } from "./schema/user.schema";
+import { createUserSessionHandler } from "./controller/session.controller";
+import { createSessionSchema } from "./schema/session.schema";
 
 export default function initializeRoutes(app: Express) {
   app.get("/healthcheck", (req: Request, res: Response) => res.send(200));
@@ -12,7 +14,11 @@ export default function initializeRoutes(app: Express) {
 
   // --- USER SESSIONS ---
   // Login
-  // POST /api/sessions
+  app.post(
+    "/api/sessions",
+    validateRequest(createSessionSchema),
+    createUserSessionHandler
+  );
 
   // Get user's sessions
   // GET /api/sessions
