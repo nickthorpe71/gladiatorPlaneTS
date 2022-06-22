@@ -5,6 +5,8 @@ import cors from "cors";
 import config from "config";
 import logger from "./utils/logger";
 import { version } from "../package.json";
+import connectDatabase from "./db/connect";
+import initializeRoutes from "./routes";
 
 const port = config.get<number>("port");
 const host = config.get<string>("host");
@@ -43,4 +45,7 @@ httpServer.listen(port, host, () => {
   logger.info(
     `Server version ${version} is listening at http://${host}:${port}`
   );
+
+  connectDatabase();
+  initializeRoutes(app);
 });

@@ -1,4 +1,4 @@
-import { Warrior } from "./model/warrior";
+import { Warrior } from "./model/warrior.model";
 
 export default function runBattleSim(
   warrior1: Warrior,
