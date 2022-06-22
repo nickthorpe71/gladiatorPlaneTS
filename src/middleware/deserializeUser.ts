@@ -40,3 +40,5 @@ const deserializeUser = async (
 
   return next();
 };
+
+export default deserializeUser;

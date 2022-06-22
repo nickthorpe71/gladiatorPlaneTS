@@ -1,9 +1,12 @@
 import { Express, Request, Response } from "express";
-import validateRequest from "./middleware/validateRequest";
 import { createUserHandler } from "./controller/user.controller";
 import { createUserSchema } from "./schema/user.schema";
-import { createUserSessionHandler } from "./controller/session.controller";
+import {
+  createUserSessionHandler,
+  invalidateUserSessionHandler,
+} from "./controller/session.controller";
 import { createSessionSchema } from "./schema/session.schema";
+import { validateRequest, requiresUser } from "./middleware";
 
 export default function initializeRoutes(app: Express) {
   app.get("/healthcheck", (req: Request, res: Response) => res.send(200));
@@ -24,7 +27,7 @@ export default function initializeRoutes(app: Express) {
   // GET /api/sessions
 
   // Logout
-  // DELETE /api/sessions
+  app.delete("/api/sessions", requiresUser, invalidateUserSessionHandler);
 
   // --- EXPERIMENTAL ---
   // Check if number is prime (with parallelism)
