@@ -16,15 +16,36 @@ function fitness(chromosome: number[]): number {
   return chromosome.reduce((acc, curr) => acc + curr, 0);
 }
 
-function algorithm(population: number[][]): number[] {
+function evaluate(population: number[][]): number[][] {
   const populationClone = population.slice();
-  const best = populationClone.sort(
+  return populationClone.sort(
     (aChromosome: number[], bChromosome: number[]): number => {
     return fitness(aChromosome) - fitness(bChromosome);
-  })[0];
+  });
+}
+
+function selection(population: number[][]): number[][][] {
+  let populationClone = population.slice();
+  let matchedPopulation: number[][][] = [];
+  for (let i = 0; i < populationSize / 2; i++) {
+    const parentA = populationClone[0];
+    const parentB = populationClone[1];
+    matchedPopulation.push([parentA, parentB]);
+    populationClone.splice(0, 2);
+  }
+  return matchedPopulation;
+}
+
+function crossover() {}
+
+function algorithm(population: number[][]): number[] {
+  const populationClone = population.slice();
+  const best = [0];
   logger.info(`Current best is ${best}`);
   return fitness(best) === 1000 ? best : algorithm(populationClone);
 }
 
 
-algorithm(initialPopulation(populationSize));
+// algorithm(initialPopulation(populationSize));
+
+console.log(selection(evaluate(initialPopulation(populationSize))));
