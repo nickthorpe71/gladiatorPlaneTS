@@ -13,3 +13,11 @@ export function range(start: number, end: number): number[] {
   }
   return newRange;
 }
+
+export function sleep(ms: number): any {
+  return new Promise((resolve: Function) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  });
+}
