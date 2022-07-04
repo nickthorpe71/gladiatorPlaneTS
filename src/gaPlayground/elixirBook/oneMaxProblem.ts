@@ -4,6 +4,14 @@ import logger from "../../utils/logger";
 const populationSize = 100;
 const chromosomeLength = 1000;
 
+function sleep(ms: number): any {
+  return new Promise((resolve: Function) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  });
+}
+
 function initialPopulation(size: number): number[][] {
   return range(1, size).map(() => randomChromosome(chromosomeLength));
 }
@@ -13,14 +21,15 @@ function randomChromosome(length: number): number[] {
 }
 
 function fitness(chromosome: number[]): number {
-  return chromosome.reduce((acc, curr) => acc + curr, 0);
+  const chromosomeClone = chromosome.slice();
+  return chromosomeClone.reduce((acc, curr) => acc + curr, 0);
 }
 
 function evaluate(population: number[][]): number[][] {
   const populationClone = population.slice();
   return populationClone.sort(
     (aChromosome: number[], bChromosome: number[]): number => {
-    return fitness(aChromosome) - fitness(bChromosome);
+    return  fitness(bChromosome) - fitness(aChromosome);
   });
 }
 
@@ -60,14 +69,21 @@ function crossoverChromosome(parentA: number[], parentB: number[]): number[] {
   return child;
 }
 
-function algorithm(population: number[][]): number[] {
+async function algorithm(population: number[][]): Promise<number[]> {
   const populationClone = population.slice();
-  const best = [0];
-  logger.info(`Current best is ${best}`);
-  return fitness(best) === 1000 ? best : algorithm(populationClone);
+  const evaluatedPopulation = evaluate(populationClone);
+  const best = evaluatedPopulation[0];
+  const bestEval = fitness(best);
+  logger.info(`Current best is: ${bestEval}`);
+  
+  if (bestEval > 700) {
+    return best;
+  }
+  else 
+  {
+    await sleep(2); // to give time for JS heap to reallocate memory
+    return algorithm(crossover(selection(evaluatedPopulation)));
+  }
 }
 
-
-// algorithm(initialPopulation(populationSize));
-
-console.log(crossover(selection(evaluate(initialPopulation(populationSize)))).length);
+logger.info(`Solution: ${algorithm(initialPopulation(populationSize))}`);
