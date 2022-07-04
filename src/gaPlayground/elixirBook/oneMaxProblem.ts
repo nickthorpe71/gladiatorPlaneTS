@@ -36,7 +36,29 @@ function selection(population: number[][]): number[][][] {
   return matchedPopulation;
 }
 
-function crossover() {}
+function crossover(matchedPopulation: number[][][]): number[][] {
+  let populationClone = matchedPopulation.slice();
+  let newPopulation: number[][] = [];
+  for (let i = 0; i < populationSize / 2; i++) {
+    const parentA = populationClone[0][0];
+    const parentB = populationClone[0][1];
+    const child1 = crossoverChromosome(parentA, parentB);
+    const child2 = crossoverChromosome(parentA, parentB);
+    newPopulation.push(child1);
+    newPopulation.push(child2);
+    populationClone.splice(0, 1);
+  }
+  return newPopulation;
+}
+
+function crossoverChromosome(parentA: number[], parentB: number[]): number[] {
+  const child = parentA.slice();
+  const crossoverPoint = Math.floor(Math.random() * chromosomeLength);
+  for (let i = crossoverPoint; i < chromosomeLength; i++) {
+    child[i] = parentB[i];
+  }
+  return child;
+}
 
 function algorithm(population: number[][]): number[] {
   const populationClone = population.slice();
@@ -48,4 +70,4 @@ function algorithm(population: number[][]): number[] {
 
 // algorithm(initialPopulation(populationSize));
 
-console.log(selection(evaluate(initialPopulation(populationSize))));
+console.log(crossover(selection(evaluate(initialPopulation(populationSize)))).length);
