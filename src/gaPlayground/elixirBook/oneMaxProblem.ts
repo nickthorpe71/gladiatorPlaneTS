@@ -72,3 +72,10 @@ const frameworkSpec: FrameworkSpec = {
 }
 
 Maeve(frameworkSpec);
+
+interface Chromosome {
+  genes: number[];
+  size: number;
+  fitness: number;
+  age: number;
+}
