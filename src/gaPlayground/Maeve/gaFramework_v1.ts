@@ -1,5 +1,7 @@
-import { range, sleep } from "../utils/index";
-import logger from "../utils/logger";
+import { range, sleep } from "../../utils/index";
+import logger from "../../utils/logger";
+
+import { Chromosome } from "./types/Chromosome";
 
 // TODO
 // fitnessFunction should always return a number

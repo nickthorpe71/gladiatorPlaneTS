@@ -54,8 +54,8 @@ function mutationFunction(chromosome: number[]): number[] {
     return chromosome;
 }
 
-function terminationCriteria(fitnessScore: number): boolean {
-    return fitnessScore > 650;
+function terminationCriteria(bestFitnessScore: number): boolean {
+    return bestFitnessScore > 650;
 }
 
 const hyperParams: HyperParameters = {
