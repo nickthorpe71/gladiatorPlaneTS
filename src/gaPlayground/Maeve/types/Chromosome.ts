@@ -19,3 +19,7 @@ export function cloneChromosome<T>(
         age: newAge || chromosome.age,
     };
 }
+
+export function stringifyChromosome<T>(chromosome: Chromosome<T>): string {
+    return `\nChromosome:\n - Genes: ${chromosome.genes}\n - Size: ${chromosome.size}\n - Fitness: ${chromosome.fitness}\n - Age: ${chromosome.age}`;
+}

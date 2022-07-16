@@ -2,7 +2,7 @@ import { range, sleep } from "../../utils/index";
 import logger from "../../utils/logger";
 
 import Problem from "./types/problem";
-import Chromosome from "./types/Chromosome";
+import Chromosome, { stringifyChromosome } from "./types/Chromosome";
 
 // TODO
 // fitnessFunction should always return a number
@@ -112,12 +112,12 @@ async function evolve<T>(
     );
     const best = evaluatedPopulation[0];
     const bestScore = problem.fitnessFunction(best);
-    logger.info(`Current best score is: ${bestScore}`);
+    // logger.info(`Current best score is: ${bestScore}`);
 
     if (problem.terminationCriteria(best)) {
         const stop = Date.now();
-        logger.info(`Solution: ${best}\nScore: ${bestScore}`);
         logger.info(`Time Taken to execute = ${(stop - start) / 1000} seconds`);
+        logger.info(stringifyChromosome(best));
         return best;
     } else {
         // sleep 2ms to give JS heap time to reallocate memory
