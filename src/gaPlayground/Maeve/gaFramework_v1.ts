@@ -1,7 +1,7 @@
 import { range, sleep } from "../../utils/index";
 import logger from "../../utils/logger";
 
-import Problem from "./types/problem";
+import Problem from "./types/Problem";
 import Chromosome, { stringifyChromosome } from "./types/Chromosome";
 
 // TODO
@@ -112,7 +112,9 @@ async function evolve<T>(
     );
     const best = evaluatedPopulation[0];
     const bestScore = problem.fitnessFunction(best);
-    // logger.info(`Current best score is: ${bestScore}`);
+
+    if (options.showLogStream)
+        logger.info(`Current best score is: ${bestScore}`);
 
     if (problem.terminationCriteria(best)) {
         const stop = Date.now();
@@ -155,6 +157,7 @@ export default async function run<T>(
 }
 
 export interface FrameworkOptions<T> {
+    showLogStream?: boolean;
     hyperParams: HyperParameters;
     crossoverFunction: (
         parentA: Chromosome<T>,
