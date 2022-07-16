@@ -1,7 +1,8 @@
 import { range, sleep } from "../../utils/index";
 import logger from "../../utils/logger";
 
-import { Chromosome } from "./types/Chromosome";
+import Problem from "./types/problem";
+import Chromosome from "./types/Chromosome";
 
 // TODO
 // fitnessFunction should always return a number
@@ -10,27 +11,44 @@ import { Chromosome } from "./types/Chromosome";
 /**
  * Creates a random population of chromosomes.
  */
-function initialPopulation<T>(chromosome: Function, size: number): T[] {
-    return range(1, size).map(() => chromosome());
+function initialPopulation<T>(
+    chromosome: Chromosome<T>,
+    size: number
+): Chromosome<T>[] {
+    return range(1, size).map(() => chromosome);
 }
 
 /**
  * Process of evaluating the population.
  */
-function evaluate<T>(population: T[], fitnessFunction: Function): T[] {
+function evaluate<T>(
+    population: Chromosome<T>[],
+    fitnessFunction: Function
+): Chromosome<T>[] {
     const populationClone = population.slice(); // for immutability
-    return populationClone.sort((aChromosome: T, bChromosome: T): number => {
-        return fitnessFunction(bChromosome) - fitnessFunction(aChromosome);
-    });
+    return populationClone
+        .map((chromosome: Chromosome<T>) => {
+            chromosome.fitness = fitnessFunction(chromosome);
+            chromosome.age = chromosome.age + 1;
+            return chromosome;
+        })
+        .sort(
+            (
+                aChromosome: Chromosome<T>,
+                bChromosome: Chromosome<T>
+            ): number => {
+                return bChromosome.fitness - aChromosome.fitness;
+            }
+        );
 }
 
 /**
  * Process of selecting the best parents to breed. In this case, selection is simply pairing adjacent parents.
  */
-function selection<T>(population: T[]): T[][] {
+function selection<T>(population: Chromosome<T>[]): Chromosome<T>[][] {
     const populationSize = population.length;
     let populationClone = population.slice(); // for immutability
-    let matchedPopulation: T[][] = [];
+    let matchedPopulation: Chromosome<T>[][] = [];
     for (let i = 0; i < populationSize / 2; i++) {
         const parentA = populationClone[0];
         const parentB = populationClone[1];
@@ -44,17 +62,17 @@ function selection<T>(population: T[]): T[][] {
  * Process of breeding (crossover) the population. Two parents create two children to preserve population size.
  */
 function crossover<T>(
-    matchedPopulation: T[][],
+    matchedPopulation: Chromosome<T>[][],
     crossoverFunction: Function
-): T[] {
+): Chromosome<T>[] {
     const halfPopulationSize = matchedPopulation.length;
     let populationClone = matchedPopulation.slice(); // for immutability
-    let newPopulation: T[] = [];
+    let newPopulation: Chromosome<T>[] = [];
     for (let i = 0; i < halfPopulationSize; i++) {
-        const parentA = populationClone[0][0];
-        const parentB = populationClone[0][1];
-        const child1 = crossoverFunction(parentA, parentB);
-        const child2 = crossoverFunction(parentA, parentB);
+        const parentA: Chromosome<T> = populationClone[0][0];
+        const parentB: Chromosome<T> = populationClone[0][1];
+        const child1: Chromosome<T> = crossoverFunction(parentA, parentB);
+        const child2: Chromosome<T> = crossoverFunction(parentA, parentB);
         newPopulation.push(child1);
         newPopulation.push(child2);
         populationClone.splice(0, 1);
@@ -66,10 +84,10 @@ function crossover<T>(
  * Process of mutating the population.
  */
 function mutation<T>(
-    population: T[],
+    population: Chromosome<T>[],
     mutationFunction: Function,
     mutationProbability: number
-): T[] {
+): Chromosome<T>[] {
     let populationClone = population.slice(); // for immutability
     return populationClone.map((chromosome) =>
         Math.random() < mutationProbability
@@ -82,22 +100,21 @@ function mutation<T>(
  * Evolves the population towards the best solution.
  */
 async function evolve<T>(
-    population: T[],
-    fitnessFunction: Function,
-    terminationCriteria: Function,
-    genotype: Function,
-    crossoverFunction: Function,
-    mutationFunction: Function,
-    mutationProbability: number,
+    population: Chromosome<T>[],
+    problem: Problem<T>,
+    options: FrameworkOptions<T>,
     start: number
-): Promise<T> {
+): Promise<Chromosome<T>> {
     const populationClone = population.slice(); // for immutability
-    const evaluatedPopulation = evaluate<T>(populationClone, fitnessFunction);
+    const evaluatedPopulation = evaluate<T>(
+        populationClone,
+        problem.fitnessFunction
+    );
     const best = evaluatedPopulation[0];
-    const bestScore = fitnessFunction(best);
+    const bestScore = problem.fitnessFunction(best);
     logger.info(`Current best score is: ${bestScore}`);
 
-    if (terminationCriteria(bestScore)) {
+    if (problem.terminationCriteria(best)) {
         const stop = Date.now();
         logger.info(`Solution: ${best}\nScore: ${bestScore}`);
         logger.info(`Time Taken to execute = ${(stop - start) / 1000} seconds`);
@@ -110,17 +127,13 @@ async function evolve<T>(
             mutation<T>(
                 crossover<T>(
                     selection<T>(evaluatedPopulation),
-                    crossoverFunction
+                    options.crossoverFunction
                 ),
-                mutationFunction,
-                mutationProbability
+                options.mutationFunction,
+                options.hyperParams.mutationProbability
             ),
-            fitnessFunction,
-            terminationCriteria,
-            genotype,
-            crossoverFunction,
-            mutationFunction,
-            mutationProbability,
+            problem,
+            options,
             start
         );
     }
@@ -129,31 +142,25 @@ async function evolve<T>(
 /**
  * Initializes the population and evolves it.
  */
-export default async function run<T>(spec: FrameworkSpec): Promise<T> {
+export default async function run<T>(
+    problem: Problem<T>,
+    options: FrameworkOptions<T>
+): Promise<Chromosome<T>> {
     const startTime = Date.now();
     const population = initialPopulation<T>(
-        spec.genotype,
-        spec.hyperParams.populationSize
+        problem.genotype(),
+        options.hyperParams.populationSize
     );
-    return await evolve<T>(
-        population,
-        spec.fitnessFunction,
-        spec.terminationCriteria,
-        spec.genotype,
-        spec.crossoverFunction,
-        spec.mutationFunction,
-        spec.hyperParams.mutationProbability,
-        startTime
-    );
+    return await evolve<T>(population, problem, options, startTime);
 }
 
-export interface FrameworkSpec {
+export interface FrameworkOptions<T> {
     hyperParams: HyperParameters;
-    fitnessFunction: Function;
-    terminationCriteria: Function;
-    genotype: Function;
-    crossoverFunction: Function;
-    mutationFunction: Function;
+    crossoverFunction: (
+        parentA: Chromosome<T>,
+        parentB: Chromosome<T>
+    ) => Chromosome<T>;
+    mutationFunction: (chromosome: Chromosome<T>) => Chromosome<T>;
 }
 
 export interface HyperParameters {

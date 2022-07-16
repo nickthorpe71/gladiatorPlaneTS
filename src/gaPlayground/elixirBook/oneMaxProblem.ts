@@ -1,32 +1,49 @@
-import { range, sleep } from "../../utils/index";
+import { range } from "../../utils/index";
 import logger from "../../utils/logger";
-import Maeve, { FrameworkSpec, HyperParameters } from "../Maeve/gaFramework_v1";
+import Maeve, {
+    FrameworkOptions,
+    HyperParameters,
+} from "../Maeve/gaFramework_v1";
+import Problem from "../Maeve/types/problem";
+import Chromosome, { cloneChromosome } from "../Maeve/types/Chromosome";
 
 const chromosomeLength = 1000;
 
 /**
  * Creates a random chromosome. This is a random binary string of length chromosomeLength.
  */
-function randomChromosome(): number[] {
-    return range(1, chromosomeLength).map(() => (Math.random() < 0.5 ? 0 : 1));
+function randomChromosome(): Chromosome<number> {
+    const newChromosome: Chromosome<number> = {
+        genes: range(1, chromosomeLength).map(() =>
+            Math.random() < 0.5 ? 0 : 1
+        ),
+        size: chromosomeLength,
+        fitness: 0,
+        age: 0,
+    };
+
+    return newChromosome;
 }
 
 /**
  * Determines the fitness of a chromosome. In this case, the fitness is the number of 1's in the chromosome, 1000 1s being the best.
  */
-function fitnessFunction(chromosome: number[]): number {
-    const chromosomeClone = chromosome.slice();
-    return chromosomeClone.reduce((acc, curr) => acc + curr, 0);
+function fitnessFunction(chromosome: Chromosome<number>): number {
+    const chromosomeGeneClone = chromosome.genes.slice(); // for immutability
+    return chromosomeGeneClone.reduce((acc, curr) => acc + curr, 0);
 }
 
 /**
  * Crossover chromosome by randomly choosing a point to split the chromosome.
  */
-function crossoverFunction(parentA: number[], parentB: number[]): number[] {
-    const child = parentA.slice();
-    const crossoverPoint = Math.floor(Math.random() * chromosomeLength);
+function crossoverFunction(
+    parentA: Chromosome<number>,
+    parentB: Chromosome<number>
+): Chromosome<number> {
+    const child: Chromosome<number> = cloneChromosome<number>(parentA);
+    const crossoverPoint = Math.floor(Math.random() * parentA.size);
     for (let i = crossoverPoint; i < chromosomeLength; i++) {
-        child[i] = parentB[i];
+        child.genes[i] = parentB.genes[i];
     }
     return child;
 }
@@ -34,9 +51,11 @@ function crossoverFunction(parentA: number[], parentB: number[]): number[] {
 /**
  * Mutate chromosome by shuffling its bits. This preserves it's fitness.
  */
-function mutationFunction(chromosome: number[]): number[] {
-    let currentIndex = chromosome.length,
-        randomIndex;
+function mutationFunction(chromosome: Chromosome<number>): Chromosome<number> {
+    const chromosomeClone: Chromosome<number> =
+        cloneChromosome<number>(chromosome);
+    let currentIndex = chromosomeClone.size;
+    let randomIndex;
 
     // While there remain elements to shuffle.
     while (currentIndex != 0) {
@@ -45,31 +64,37 @@ function mutationFunction(chromosome: number[]): number[] {
         currentIndex--;
 
         // And swap it with the current element.
-        [chromosome[currentIndex], chromosome[randomIndex]] = [
-            chromosome[randomIndex],
-            chromosome[currentIndex],
+        [
+            chromosomeClone.genes[currentIndex],
+            chromosomeClone.genes[randomIndex],
+        ] = [
+            chromosomeClone.genes[randomIndex],
+            chromosomeClone.genes[currentIndex],
         ];
     }
 
-    return chromosome;
+    return chromosomeClone;
 }
 
-function terminationCriteria(bestFitnessScore: number): boolean {
-    return bestFitnessScore > 650;
+function terminationCriteria(chromosome: Chromosome<number>): boolean {
+    return chromosome.fitness > 650;
 }
+
+const problemDefinition: Problem<number> = {
+    genotype: randomChromosome,
+    fitnessFunction,
+    terminationCriteria,
+};
 
 const hyperParams: HyperParameters = {
     populationSize: 100,
     mutationProbability: 0.05,
 };
 
-const frameworkSpec: FrameworkSpec = {
+const frameworkOptions: FrameworkOptions<number> = {
     hyperParams,
-    fitnessFunction,
-    terminationCriteria,
-    genotype: randomChromosome,
     crossoverFunction,
     mutationFunction,
 };
 
-Maeve(frameworkSpec);
+Maeve(problemDefinition, frameworkOptions);
