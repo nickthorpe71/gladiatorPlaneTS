@@ -4,10 +4,6 @@ import logger from "../../utils/logger";
 import Problem from "./types/Problem";
 import Chromosome, { stringifyChromosome } from "./types/Chromosome";
 
-// TODO
-// fitnessFunction should always return a number
-// handle uneven population sizes
-
 /**
  * Creates a random population of chromosomes.
  */
