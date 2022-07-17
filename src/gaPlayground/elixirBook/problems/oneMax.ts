@@ -40,6 +40,8 @@ function crossoverFunction(
     parentB: Chromosome<number>
 ): Chromosome<number> {
     const child: Chromosome<number> = cloneChromosome<number>(parentA);
+    child.fitness = 0;
+    child.age = 0;
     const crossoverPoint = Math.floor(Math.random() * parentA.size);
     for (let i = crossoverPoint; i < chromosomeLength; i++) {
         child.genes[i] = parentB.genes[i];
@@ -75,7 +77,10 @@ function mutationFunction(chromosome: Chromosome<number>): Chromosome<number> {
     return chromosomeClone;
 }
 
-function terminationCriteria(chromosome: Chromosome<number>): boolean {
+function terminationCriteria(
+    chromosome: Chromosome<number>,
+    generation: number
+): boolean {
     return chromosome.fitness > 650;
 }
 

@@ -25,11 +25,24 @@ function randomChromosome(): Chromosome<number> {
 }
 
 /**
- * Determines the fitness of a chromosome. In this case, the fitness is the number of 1's in the chromosome, 1000 1s being the best.
+ * Determines the fitness of a chromosome. In this case, the fitness is the total profit of the cargo.
  */
 function fitnessFunction(chromosome: Chromosome<number>): number {
     const chromosomeGeneClone = chromosome.genes.slice(); // for immutability
-    return chromosomeGeneClone.reduce((acc, curr) => acc + curr, 0);
+
+    const cargoProfits = [6, 5, 8, 9, 6, 7, 3, 1, 2, 6];
+    const cargoWeights = [10, 6, 8, 7, 10, 9, 7, 11, 6, 8];
+    const weightLimit = 40;
+
+    const totalCargoProfit = chromosomeGeneClone
+        .map((gene, i) => cargoProfits[i] * gene)
+        .reduce((acc, curr) => acc + curr, 0);
+
+    const totalCargoWeight = chromosomeGeneClone
+        .map((gene, index) => gene * cargoWeights[index])
+        .reduce((acc, curr) => acc + curr, 0);
+
+    return totalCargoWeight > weightLimit ? 0 : totalCargoProfit;
 }
 
 /**
@@ -40,6 +53,8 @@ function crossoverFunction(
     parentB: Chromosome<number>
 ): Chromosome<number> {
     const child: Chromosome<number> = cloneChromosome<number>(parentA);
+    child.fitness = 0;
+    child.age = 0;
     const crossoverPoint = Math.floor(Math.random() * parentA.size);
     for (let i = crossoverPoint; i < chromosomeLength; i++) {
         child.genes[i] = parentB.genes[i];
@@ -75,8 +90,11 @@ function mutationFunction(chromosome: Chromosome<number>): Chromosome<number> {
     return chromosomeClone;
 }
 
-function terminationCriteria(chromosome: Chromosome<number>): boolean {
-    return chromosome.fitness > 650;
+function terminationCriteria(
+    fittestChromosome: Chromosome<number>,
+    generation: number
+): boolean {
+    return generation === 100;
 }
 
 const problemDefinition: Problem<number> = {
@@ -86,14 +104,26 @@ const problemDefinition: Problem<number> = {
 };
 
 const hyperParams: HyperParameters = {
-    populationSize: 100,
+    populationSize: 50,
     mutationProbability: 0.05,
 };
 
 const frameworkOptions: FrameworkOptions<number> = {
+    showLogStream: true,
     hyperParams,
     crossoverFunction,
     mutationFunction,
 };
+
+async function getBestSolution() {
+    const bestSolution = await Maeve(problemDefinition, frameworkOptions);
+    const cargoWeights = [10, 6, 8, 7, 10, 9, 7, 11, 6, 8];
+    const totalCargoWeight = bestSolution.genes
+        .map((gene, index) => gene * cargoWeights[index])
+        .reduce((acc, curr) => acc + curr, 0);
+    console.log("Weight is:", totalCargoWeight);
+}
+
+getBestSolution();
 
 Maeve(problemDefinition, frameworkOptions);
