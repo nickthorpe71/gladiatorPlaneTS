@@ -98,6 +98,7 @@ function mutation<T>(
 async function evolve<T>(
     population: Chromosome<T>[],
     problem: Problem<T>,
+    generation: number,
     options: FrameworkOptions<T>,
     start: number
 ): Promise<Chromosome<T>> {
@@ -112,7 +113,7 @@ async function evolve<T>(
     if (options.showLogStream)
         logger.info(`Current best score is: ${bestScore}`);
 
-    if (problem.terminationCriteria(best)) {
+    if (problem.terminationCriteria(best, generation)) {
         const stop = Date.now();
         logger.info(`Time Taken to execute = ${(stop - start) / 1000} seconds`);
         logger.info(stringifyChromosome(best));
@@ -131,6 +132,7 @@ async function evolve<T>(
                 options.hyperParams.mutationProbability
             ),
             problem,
+            generation + 1,
             options,
             start
         );
@@ -149,7 +151,8 @@ export default async function run<T>(
         problem.genotype(),
         options.hyperParams.populationSize
     );
-    return await evolve<T>(population, problem, options, startTime);
+    const generation = 0;
+    return await evolve<T>(population, problem, generation, options, startTime);
 }
 
 export interface FrameworkOptions<T> {
