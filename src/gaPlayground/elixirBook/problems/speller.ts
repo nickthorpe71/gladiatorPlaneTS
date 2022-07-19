@@ -93,6 +93,7 @@ const problemDefinition: Problem<string> = {
 const hyperParams: HyperParameters = {
     populationSize: 2000,
     mutationProbability: 0.25,
+    coolingRate: 0.99,
 };
 
 const frameworkOptions: FrameworkOptions<string> = {

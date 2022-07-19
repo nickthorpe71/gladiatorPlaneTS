@@ -99,6 +99,8 @@ async function evolve<T>(
     population: Chromosome<T>[],
     problem: Problem<T>,
     generation: number,
+    lastMaxFitness: number,
+    temperature: number,
     options: FrameworkOptions<T>,
     start: number
 ): Promise<Chromosome<T>> {
@@ -108,19 +110,21 @@ async function evolve<T>(
         problem.fitnessFunction
     );
     const best = evaluatedPopulation[0];
-    const bestScore = problem.fitnessFunction(best);
+    const bestFitness = problem.fitnessFunction(best);
+    const newTemperature =
+        (1 - options.hyperParams.coolingRate) *
+        (temperature + (bestFitness - lastMaxFitness));
 
     if (options.showLogStream)
-        logger.info(`Current best score is: ${bestScore}`);
+        logger.info(`Current best fitness is: ${bestFitness}`);
 
-    if (problem.terminationCriteria(best, generation)) {
+    if (problem.terminationCriteria(best, generation, newTemperature)) {
         const stop = Date.now();
         logger.info(`Time Taken to execute = ${(stop - start) / 1000} seconds`);
         logger.info(stringifyChromosome(best));
         return best;
     } else {
-        // sleep 2ms to give JS heap time to reallocate memory
-        await sleep(2);
+        await sleep(2); // sleep 2ms to give JS heap time to reallocate memory
 
         return evolve<T>(
             mutation<T>(
@@ -133,6 +137,8 @@ async function evolve<T>(
             ),
             problem,
             generation + 1,
+            bestFitness,
+            newTemperature,
             options,
             start
         );
@@ -152,7 +158,17 @@ export default async function run<T>(
         options.hyperParams.populationSize
     );
     const generation = 0;
-    return await evolve<T>(population, problem, generation, options, startTime);
+    const lastMaxFitness = 0;
+    const temperature = 0;
+    return await evolve<T>(
+        population,
+        problem,
+        generation,
+        lastMaxFitness,
+        temperature,
+        options,
+        startTime
+    );
 }
 
 export interface FrameworkOptions<T> {
@@ -168,4 +184,5 @@ export interface FrameworkOptions<T> {
 export interface HyperParameters {
     populationSize: number;
     mutationProbability: number;
+    coolingRate: number;
 }

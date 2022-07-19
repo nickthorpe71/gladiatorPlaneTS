@@ -5,6 +5,7 @@ export default interface Problem<T> {
     fitnessFunction: (chromosome: Chromosome<T>) => number;
     terminationCriteria: (
         population: Chromosome<T>,
-        generation: number
+        generation: number,
+        temperature: number
     ) => boolean;
 }
