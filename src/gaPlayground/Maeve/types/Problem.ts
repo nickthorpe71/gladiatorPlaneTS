@@ -4,8 +4,8 @@ export default interface Problem<T> {
     genotype: () => Chromosome<T>;
     fitnessFunction: (chromosome: Chromosome<T>) => number;
     terminationCriteria: (
-        population: Chromosome<T>,
+        bestFitness: Chromosome<T>,
         generation: number,
-        temperature: number
+        temperature?: number
     ) => boolean;
 }

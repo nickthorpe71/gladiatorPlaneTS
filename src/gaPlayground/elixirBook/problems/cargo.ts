@@ -90,12 +90,11 @@ function mutationFunction(chromosome: Chromosome<number>): Chromosome<number> {
     return chromosomeClone;
 }
 
-function terminationCriteria(
-    fittestChromosome: Chromosome<number>,
-    generation: number,
-    temperature: number
+function terminationCriteria(   
+    bestFitness: Chromosome<number>,
+    generation: number
 ): boolean {
-    return temperature < 25;
+    return generation === 1000;
 }
 
 const problemDefinition: Problem<number> = {
@@ -105,7 +104,7 @@ const problemDefinition: Problem<number> = {
 };
 
 const hyperParams: HyperParameters = {
-    populationSize: 50,
+    populationSize: 1500,
     mutationProbability: 0.05,
     coolingRate: 0.8,
 };
