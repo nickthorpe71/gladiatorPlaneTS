@@ -26,11 +26,13 @@ function genotype(): Chromosome<[number, number]> {
 }
 
 /**
- * Determines the fitness of a chromosome.
+ * Determines the fitness of a chromosome. In this instance this is the weighted sum of the RoI minus risk.
+ * More specifically, the RoI is twice as important as the risk in this situation.
  */
 function fitnessFunction(chromosome: Chromosome<[number, number]>): number {
-    // TODO
-    return 0;
+    return chromosome.genes
+        .map(([roi, risk]) => 2 * roi - risk)
+        .reduce((a, b) => a + b);
 }
 
 /**
@@ -96,7 +98,7 @@ const problemDefinition: Problem<[number, number]> = {
 
 const hyperParams: HyperParameters = {
     populationSize: 1500,
-    mutationProbability: 0.05,
+    mutationProbability: 0.15,
     coolingRate: 0.8,
 };
 
