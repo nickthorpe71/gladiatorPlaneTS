@@ -2,6 +2,8 @@ import { range } from "../../../utils/index";
 import Maeve, {
     FrameworkOptions,
     HyperParameters,
+    selectionFunctions,
+    SelectionType,
 } from "../../Maeve/gaFramework_v1";
 import Problem from "../../Maeve/types/Problem";
 import Chromosome, { cloneChromosome } from "../../Maeve/types/Chromosome";
@@ -100,6 +102,8 @@ const frameworkOptions: FrameworkOptions<number> = {
     hyperParams,
     crossoverFunction,
     mutationFunction,
+    selectionFunction: selectionFunctions[SelectionType.ELITISM],
+    selectionRate: 0.8,
 };
 
 Maeve(problemDefinition, frameworkOptions);

@@ -1,4 +1,4 @@
-import { range, sleep } from "../../utils/index";
+import { range, sleep, chunkEvery } from "../../utils/index";
 import logger from "../../utils/logger";
 
 import Problem from "./types/Problem";
@@ -41,17 +41,28 @@ function evaluate<T>(
 /**
  * Process of selecting the best parents to breed. In this case, selection is simply pairing adjacent parents.
  */
-function selection<T>(population: Chromosome<T>[]): Chromosome<T>[][] {
+function selection<T>(
+    population: Chromosome<T>[],
+    selectionFunction: (population: Chromosome<T>[]) => Chromosome<T>[],
+    selectionRate: number
+): { parents: Chromosome<T>[][]; leftovers: Chromosome<T>[] } {
     const populationSize = population.length;
     let populationClone = population.slice(); // for immutability
-    let matchedPopulation: Chromosome<T>[][] = [];
-    for (let i = 0; i < populationSize / 2; i++) {
-        const parentA = populationClone[0];
-        const parentB = populationClone[1];
-        matchedPopulation.push([parentA, parentB]);
-        populationClone.splice(0, 2);
-    }
-    return matchedPopulation;
+
+    const roundedPopulationSize = Math.round(populationSize * selectionRate);
+    // Make sure we have enough parents to make pairs
+    const numParents =
+        roundedPopulationSize % 2 === 0
+            ? roundedPopulationSize
+            : roundedPopulationSize + 1;
+
+    const parents = chunkEvery(
+        selectionFunction(populationClone.slice(0, numParents)),
+        2
+    );
+    const leftovers = populationClone.splice(numParents);
+
+    return { parents, leftovers };
 }
 
 /**
@@ -126,12 +137,18 @@ async function evolve<T>(
     } else {
         await sleep(2); // sleep 2ms to give JS heap time to reallocate memory
 
+        const { parents, leftovers } = selection<T>(
+            populationClone,
+            options.selectionFunction,
+            options.selectionRate
+        );
+
+        const children = crossover<T>(parents, options.crossoverFunction);
+        const newPopulation = children.concat(leftovers);
+
         return evolve<T>(
             mutation<T>(
-                crossover<T>(
-                    selection<T>(evaluatedPopulation),
-                    options.crossoverFunction
-                ),
+                newPopulation,
                 options.mutationFunction,
                 options.hyperParams.mutationProbability
             ),
@@ -179,6 +196,8 @@ export interface FrameworkOptions<T> {
         parentB: Chromosome<T>
     ) => Chromosome<T>;
     mutationFunction: (chromosome: Chromosome<T>) => Chromosome<T>;
+    selectionFunction: (population: Chromosome<T>[]) => Chromosome<T>[];
+    selectionRate: number;
 }
 
 export interface HyperParameters {
@@ -186,3 +205,5 @@ export interface HyperParameters {
     mutationProbability: number;
     coolingRate: number;
 }
+
+export { selectionFunctions, SelectionType } from "./toolbox/selection";
