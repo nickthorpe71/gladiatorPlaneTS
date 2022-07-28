@@ -43,7 +43,10 @@ function evaluate<T>(
  */
 function selection<T>(
     population: Chromosome<T>[],
-    selectionFunction: (population: Chromosome<T>[]) => Chromosome<T>[],
+    selectionFunction: (
+        population: Chromosome<T>[],
+        numToSelect: number
+    ) => Chromosome<T>[],
     selectionRate: number
 ): { parents: Chromosome<T>[][]; leftovers: Chromosome<T>[] } {
     const populationSize = population.length;
@@ -56,10 +59,8 @@ function selection<T>(
             ? roundedPopulationSize
             : roundedPopulationSize + 1;
 
-    const parents = chunkEvery(
-        selectionFunction(populationClone.slice(0, numParents)),
-        2
-    );
+    const selectedParents = selectionFunction(populationClone, numParents);
+    const parents = chunkEvery(selectedParents, 2);
     const leftovers = populationClone.splice(numParents);
 
     return { parents, leftovers };
@@ -196,7 +197,10 @@ export interface FrameworkOptions<T> {
         parentB: Chromosome<T>
     ) => Chromosome<T>;
     mutationFunction: (chromosome: Chromosome<T>) => Chromosome<T>;
-    selectionFunction: (population: Chromosome<T>[]) => Chromosome<T>[];
+    selectionFunction: (
+        population: Chromosome<T>[],
+        numToSelect: number
+    ) => Chromosome<T>[];
     selectionRate: number;
 }
 

@@ -1,19 +1,33 @@
 import Chromosome from "../types/Chromosome";
+import { shuffleArray } from "../../../utils/index";
 
-function elitism<T>(populationFraction: Chromosome<T>[]): Chromosome<T>[] {
-    return populationFraction;
+function elitism<T>(
+    population: Chromosome<T>[],
+    numToSelect: number
+): Chromosome<T>[] {
+    return population.slice(0, numToSelect);
 }
 
-function random<T>(populationFraction: Chromosome<T>[]): Chromosome<T>[] {
-    return populationFraction;
+function random<T>(
+    population: Chromosome<T>[],
+    numToSelect: number
+): Chromosome<T>[] {
+    const shuffledPopulation = shuffleArray(population);
+    return shuffledPopulation.slice(0, numToSelect);
 }
 
-function tournament<T>(populationFraction: Chromosome<T>[]): Chromosome<T>[] {
-    return populationFraction;
+function tournament<T>(
+    population: Chromosome<T>[],
+    numToSelect: number
+): Chromosome<T>[] {
+    return population;
 }
 
-function roulette<T>(populationFraction: Chromosome<T>[]): Chromosome<T>[] {
-    return populationFraction;
+function roulette<T>(
+    population: Chromosome<T>[],
+    numToSelect: number
+): Chromosome<T>[] {
+    return population;
 }
 
 export enum SelectionType {
