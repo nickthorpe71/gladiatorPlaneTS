@@ -199,7 +199,8 @@ export interface FrameworkOptions<T> {
     mutationFunction: (chromosome: Chromosome<T>) => Chromosome<T>;
     selectionFunction: (
         population: Chromosome<T>[],
-        numToSelect: number
+        numToSelect: number,
+        tournamentSize?: number
     ) => Chromosome<T>[];
     selectionRate: number;
 }

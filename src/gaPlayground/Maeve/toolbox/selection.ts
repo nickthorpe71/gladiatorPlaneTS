@@ -1,5 +1,6 @@
 import Chromosome from "../types/Chromosome";
-import { shuffleArray } from "../../../utils/index";
+import { shuffleArray, range } from "../../../utils/index";
+import { maxBy } from "lodash";
 
 function elitism<T>(
     population: Chromosome<T>[],
@@ -18,9 +19,18 @@ function random<T>(
 
 function tournament<T>(
     population: Chromosome<T>[],
-    numToSelect: number
+    numToSelect: number,
+    tournamentSize: number
 ): Chromosome<T>[] {
-    return population;
+    return range(1, numToSelect).map(() => {
+        const tournament: Chromosome<T>[] = shuffleArray<Chromosome<T>>(
+            population
+        ).slice(0, tournamentSize);
+        return maxBy(
+            tournament,
+            (chromosome) => chromosome.fitness
+        ) as Chromosome<T>;
+    });
 }
 
 function roulette<T>(
