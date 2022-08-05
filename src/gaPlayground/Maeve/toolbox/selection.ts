@@ -73,7 +73,22 @@ function roulette<T>(
     population: Chromosome<T>[],
     numToSelect: number
 ): Chromosome<T>[] {
-    return population;
+    const sumFitness = population
+        .map((chromosome) => chromosome.fitness)
+        .reduce((acc, fitness) => acc + fitness, 0);
+
+    return range(1, numToSelect).map(() => {
+        const random = Math.random() * sumFitness;
+        let sum = 0;
+        let result: Chromosome<T> = population[0];
+        for (const chromosome of population) {
+            sum += chromosome.fitness;
+            if (sum > random) {
+                result = chromosome;
+            }
+        }
+        return result;
+    });
 }
 
 export enum SelectionType {
