@@ -2,12 +2,11 @@ import { range, randInt } from "../../../utils/index";
 import Maeve, {
     FrameworkOptions,
     HyperParameters,
+    selectionFunctions,
+    SelectionType,
 } from "../../Maeve/gaFramework_v1";
 import Problem from "../../Maeve/types/Problem";
-import Chromosome, {
-    cloneChromosome,
-    stringifyChromosome,
-} from "../../Maeve/types/Chromosome";
+import Chromosome, { cloneChromosome } from "../../Maeve/types/Chromosome";
 
 const chromosomeLength = 34;
 
@@ -101,6 +100,8 @@ const frameworkOptions: FrameworkOptions<string> = {
     hyperParams,
     crossoverFunction,
     mutationFunction,
+    selectionFunction: selectionFunctions[SelectionType.ELITISM],
+    selectionRate: 0.8,
 };
 
 Maeve(problemDefinition, frameworkOptions);

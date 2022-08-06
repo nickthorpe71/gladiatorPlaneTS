@@ -1,4 +1,4 @@
-import { range } from "../../../utils/index";
+import { range, shuffleArray } from "../../../utils/index";
 import Maeve, {
     FrameworkOptions,
     HyperParameters,
@@ -8,16 +8,14 @@ import Maeve, {
 import Problem from "../../Maeve/types/Problem";
 import Chromosome, { cloneChromosome } from "../../Maeve/types/Chromosome";
 
-const chromosomeLength = 10;
+const chromosomeLength = 7;
 
 /**
- * Creates a random chromosome. This is a random binary string of length chromosomeLength.
+ * Creates a random chromosome. This is a permutation genotype.
  */
-function randomChromosome(): Chromosome<number> {
+function genotype(): Chromosome<number> {
     const newChromosome: Chromosome<number> = {
-        genes: range(1, chromosomeLength).map(() =>
-            Math.random() < 0.5 ? 0 : 1
-        ),
+        genes: shuffleArray(range(0, chromosomeLength)),
         size: chromosomeLength,
         fitness: 0,
         age: 0,
@@ -27,24 +25,11 @@ function randomChromosome(): Chromosome<number> {
 }
 
 /**
- * Determines the fitness of a chromosome. In this case, the fitness is the total profit of the cargo.
+ * Determines the fitness of a chromosome..
  */
 function fitnessFunction(chromosome: Chromosome<number>): number {
     const chromosomeGeneClone = chromosome.genes.slice(); // for immutability
-
-    const cargoProfits = [6, 5, 8, 9, 6, 7, 3, 1, 2, 6];
-    const cargoWeights = [10, 6, 8, 7, 10, 9, 7, 11, 6, 8];
-    const weightLimit = 40;
-
-    const totalCargoProfit = chromosomeGeneClone
-        .map((gene, i) => cargoProfits[i] * gene)
-        .reduce((acc, curr) => acc + curr, 0);
-
-    const totalCargoWeight = chromosomeGeneClone
-        .map((gene, index) => gene * cargoWeights[index])
-        .reduce((acc, curr) => acc + curr, 0);
-
-    return totalCargoWeight > weightLimit ? 0 : totalCargoProfit;
+    return chromosomeGeneClone.reduce((acc, curr) => acc + curr, 0);
 }
 
 /**
@@ -93,42 +78,30 @@ function mutationFunction(chromosome: Chromosome<number>): Chromosome<number> {
 }
 
 function terminationCriteria(
-    bestFitness: Chromosome<number>,
+    chromosome: Chromosome<number>,
     generation: number
 ): boolean {
-    return generation === 1000;
+    return chromosome.fitness > 650;
 }
 
 const problemDefinition: Problem<number> = {
-    genotype: randomChromosome,
+    genotype,
     fitnessFunction,
     terminationCriteria,
 };
 
 const hyperParams: HyperParameters = {
-    populationSize: 1500,
+    populationSize: 100,
     mutationProbability: 0.05,
     coolingRate: 0.8,
 };
 
 const frameworkOptions: FrameworkOptions<number> = {
-    showLogStream: true,
     hyperParams,
     crossoverFunction,
     mutationFunction,
     selectionFunction: selectionFunctions[SelectionType.ELITISM],
     selectionRate: 0.8,
 };
-
-async function getBestSolution() {
-    const bestSolution = await Maeve(problemDefinition, frameworkOptions);
-    const cargoWeights = [10, 6, 8, 7, 10, 9, 7, 11, 6, 8];
-    const totalCargoWeight = bestSolution.genes
-        .map((gene, index) => gene * cargoWeights[index])
-        .reduce((acc, curr) => acc + curr, 0);
-    console.log("Weight is:", totalCargoWeight);
-}
-
-getBestSolution();
 
 Maeve(problemDefinition, frameworkOptions);
