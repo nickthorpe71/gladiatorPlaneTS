@@ -1,5 +1,8 @@
 import Chromosome from "../types/Chromosome";
 
+/**
+ * Preserves permutation of genes.
+ */
 function orderOne<T>(
     population: Chromosome<T>[],
     numToSelect: number

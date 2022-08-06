@@ -1,24 +1,18 @@
 ## TODO
 
--   [ ] find a tree-based example of a problem to solve
 -   [ ] handle uneven populations
--   [ ] work towards not having to write much code can just input parameters
 
--   -   > example: fr genotype function input type (binary, permutation, real-value, tree) and length of chromosome, potential values, etc., and the algorithm creates the function for you
-
-# Problems Maeve Should Be Able to Solve
-
-## Elementary
+# Problems To Solved
 
 1. OneMax
 2. Speller
+3. Knapsack
+4. 5 Queens
 
-## Advanced
+# Problems To Solve
 
 1. Navigate a 2D grid maze
 2. Traveling salesman
-3. Knapsack
-4. 5 Queens
 
 ## Possible Others
 
@@ -40,7 +34,7 @@
 
 # Maeve Docs
 
-What is Maeve? A framework to use parameterized inputs to create genetic algorithms easily.
+What is Maeve? A framework to use parameterized inputs to create and utilize genetic algorithms easily. The idea is it's easy to experiment with different parameters, observe the results, then when you've found the parameters that work best for your solution, run the framework in performance mode to calculate at a very efficient rate.
 
 ### What is a Genetic Algorithm?
 

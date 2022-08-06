@@ -3,26 +3,13 @@ import { range, sum, flatten, uniq } from "lodash";
 import Maeve, {
     FrameworkOptions,
     HyperParameters,
+    genotype,
     selectionStrategy,
 } from "../../Maeve/gaFramework_v1";
 import Problem from "../../Maeve/types/Problem";
 import Chromosome, { cloneChromosome } from "../../Maeve/types/Chromosome";
 
 const chromosomeLength = 8;
-
-/**
- * Creates a random chromosome. This is a permutation genotype.
- */
-function genotype(): Chromosome<number> {
-    const newChromosome: Chromosome<number> = {
-        genes: shuffleArray(range(0, chromosomeLength)),
-        size: chromosomeLength,
-        fitness: 0,
-        age: 0,
-    };
-
-    return newChromosome;
-}
 
 /**
  * Determines the fitness of a chromosome. For N-Queens the fitness is calculated by checking how many queens are attacking each other.
@@ -98,7 +85,11 @@ function terminationCriteria(
 }
 
 const problemDefinition: Problem<number> = {
-    genotype,
+    genotype: () =>
+        genotype.permutation<number>(
+            chromosomeLength,
+            range(0, chromosomeLength)
+        ),
     fitnessFunction,
     terminationCriteria,
 };

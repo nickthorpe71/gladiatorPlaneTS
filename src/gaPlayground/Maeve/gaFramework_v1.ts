@@ -212,4 +212,7 @@ export interface HyperParameters {
     coolingRate: number;
 }
 
+// exports
 export { selectionStrategy } from "./toolbox/selection";
+export { crossoverStrategy } from "./toolbox/crossover";
+export { genotype } from "./toolbox/genotype";
