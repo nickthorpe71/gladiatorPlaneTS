@@ -27,6 +27,7 @@ function genotype(): Chromosome<number> {
 
 /**
  * Determines the fitness of a chromosome. For N-Queens the fitness is calculated by checking how many queens are attacking each other.
+ * This function returns the number of non-conflicts.
  */
 function fitnessFunction(chromosome: Chromosome<number>): number {
     const chromosomeGeneClone = chromosome.genes.slice();
@@ -94,7 +95,7 @@ function terminationCriteria(
     chromosome: Chromosome<number>,
     generation: number
 ): boolean {
-    return chromosome.fitness > 650;
+    return chromosome.fitness === 8;
 }
 
 const problemDefinition: Problem<number> = {
