@@ -1,4 +1,5 @@
-import { range, sleep, chunkEvery } from "../../utils/index";
+import { sleep, chunkEvery } from "../../utils/index";
+import { range } from "lodash";
 import logger from "../../utils/logger";
 
 import Problem from "./types/Problem";
@@ -11,7 +12,7 @@ function initialPopulation<T>(
     chromosome: Chromosome<T>,
     size: number
 ): Chromosome<T>[] {
-    return range(1, size).map(() => chromosome);
+    return range(0, size - 1).map(() => chromosome);
 }
 
 /**
@@ -136,7 +137,7 @@ async function evolve<T>(
         logger.info(stringifyChromosome(best));
         return best;
     } else {
-        await sleep(2); // sleep 2ms to give JS heap time to reallocate memory
+        await sleep(0.001); // sleep 1 microsecond to give JS heap time to reallocate memory / prevent max call stack error
 
         const { parents, leftovers } = selection<T>(
             populationClone,
@@ -211,4 +212,4 @@ export interface HyperParameters {
     coolingRate: number;
 }
 
-export { selectionFunctions, SelectionType } from "./toolbox/selection";
+export { selectionStrategy } from "./toolbox/selection";

@@ -2,8 +2,7 @@ import { range } from "../../../utils/index";
 import Maeve, {
     FrameworkOptions,
     HyperParameters,
-    selectionFunctions,
-    SelectionType,
+    selectionStrategy,
 } from "../../Maeve/gaFramework_v1";
 import Problem from "../../Maeve/types/Problem";
 import Chromosome, { cloneChromosome } from "../../Maeve/types/Chromosome";
@@ -83,7 +82,7 @@ function terminationCriteria(
     chromosome: Chromosome<number>,
     generation: number
 ): boolean {
-    return chromosome.fitness > 650;
+    return chromosome.fitness > 900;
 }
 
 const problemDefinition: Problem<number> = {
@@ -102,7 +101,7 @@ const frameworkOptions: FrameworkOptions<number> = {
     hyperParams,
     crossoverFunction,
     mutationFunction,
-    selectionFunction: selectionFunctions[SelectionType.ELITISM],
+    selectionFunction: selectionStrategy.elitism,
     selectionRate: 0.8,
 };
 

@@ -1,15 +1,14 @@
-import { range, shuffleArray } from "../../../utils/index";
-import { sum, flatten, uniq } from "lodash";
+import { shuffleArray } from "../../../utils/index";
+import { range, sum, flatten, uniq } from "lodash";
 import Maeve, {
     FrameworkOptions,
     HyperParameters,
-    selectionFunctions,
-    SelectionType,
+    selectionStrategy,
 } from "../../Maeve/gaFramework_v1";
 import Problem from "../../Maeve/types/Problem";
 import Chromosome, { cloneChromosome } from "../../Maeve/types/Chromosome";
 
-const chromosomeLength = 7;
+const chromosomeLength = 8;
 
 /**
  * Creates a random chromosome. This is a permutation genotype.
@@ -114,7 +113,7 @@ const frameworkOptions: FrameworkOptions<number> = {
     hyperParams,
     crossoverFunction,
     mutationFunction,
-    selectionFunction: selectionFunctions[SelectionType.ELITISM],
+    selectionFunction: selectionStrategy.elitism,
     selectionRate: 0.8,
 };
 

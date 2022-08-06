@@ -1,6 +1,6 @@
 import Chromosome from "../types/Chromosome";
-import { shuffleArray, range } from "../../../utils/index";
-import { maxBy } from "lodash";
+import { shuffleArray } from "../../../utils/index";
+import { maxBy, range } from "lodash";
 
 function elitism<T>(
     population: Chromosome<T>[],
@@ -22,7 +22,7 @@ function tournament<T>(
     numToSelect: number,
     tournamentSize: number
 ): Chromosome<T>[] {
-    return range(1, numToSelect).map(() => {
+    return range(0, numToSelect - 1).map(() => {
         const tournament: Chromosome<T>[] = shuffleArray<Chromosome<T>>(
             population
         ).slice(0, tournamentSize);
@@ -77,7 +77,7 @@ function roulette<T>(
         .map((chromosome) => chromosome.fitness)
         .reduce((acc, fitness) => acc + fitness, 0);
 
-    return range(1, numToSelect).map(() => {
+    return range(0, numToSelect - 1).map(() => {
         const random = Math.random() * sumFitness;
         let sum = 0;
         let result: Chromosome<T> = population[0];
@@ -91,18 +91,10 @@ function roulette<T>(
     });
 }
 
-export enum SelectionType {
-    ELITISM,
-    RANDOM,
-    TOURNAMENT,
-    TOURNAMENT_NO_DUPLICATES,
-    ROULETTE,
-}
-
-export const selectionFunctions = {
-    [SelectionType.ELITISM]: elitism,
-    [SelectionType.RANDOM]: random,
-    [SelectionType.TOURNAMENT]: tournament,
-    [SelectionType.TOURNAMENT_NO_DUPLICATES]: tournamentNoDuplicates,
-    [SelectionType.ROULETTE]: roulette,
+export const selectionStrategy = {
+    elitism,
+    random,
+    tournament,
+    tournamentNoDuplicates,
+    roulette,
 };
