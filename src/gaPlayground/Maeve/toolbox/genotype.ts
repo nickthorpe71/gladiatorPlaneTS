@@ -18,7 +18,7 @@ function binary(size: number): Chromosome<number> {
 }
 
 /**
- * Creates a random chromosome. This is a permutation genotype. Permutation genotypes are especially effective for scheduling problems or finding paths in a finite set of problems. Permutation genotypes are also called combinatorial optimization, which look for ordered solutions.
+ * Creates a random chromosome from given pool. This is a permutation genotype. Permutation genotypes are especially effective for scheduling problems or finding paths in a finite set of problems. Permutation genotypes are also called combinatorial optimization, which look for ordered solutions.
  * @param size - size of the chromosome
  * @param pool - pool of possible values for each gene
  * @returns Chromosome<T>
@@ -34,7 +34,31 @@ function permutation<T>(size: number, pool: T[]): Chromosome<T> {
     return newChromosome;
 }
 
+function realValue() {}
+
+/**
+ * Creates a random chromosome from given pool.
+ * @param size - size of the chromosome
+ * @param pool - pool of possible values for each gene
+ * @returns Chromosome<T>
+ */
+function general<T>(size: number, pool: T[]): Chromosome<T> {
+    const newChromosome: Chromosome<T> = {
+        genes: shuffle(pool).slice(0, size),
+        size,
+        fitness: 0,
+        age: 0,
+    };
+
+    return newChromosome;
+}
+
+function graph() {}
+
+function neuralNetwork() {}
+
 export const genotype = {
     binary,
     permutation,
+    general,
 };
