@@ -1,4 +1,5 @@
 import { range, shuffleArray } from "../../../utils/index";
+import { sum, flatten, uniq } from "lodash";
 import Maeve, {
     FrameworkOptions,
     HyperParameters,
@@ -25,11 +26,23 @@ function genotype(): Chromosome<number> {
 }
 
 /**
- * Determines the fitness of a chromosome..
+ * Determines the fitness of a chromosome. For N-Queens the fitness is calculated by checking how many queens are attacking each other.
  */
 function fitnessFunction(chromosome: Chromosome<number>): number {
-    const chromosomeGeneClone = chromosome.genes.slice(); // for immutability
-    return chromosomeGeneClone.reduce((acc, curr) => acc + curr, 0);
+    const chromosomeGeneClone = chromosome.genes.slice();
+    const diagonalClashes = range(0, chromosome.size).map((i) => {
+        return range(0, chromosome.size).map((j) => {
+            if (i === j) return 0;
+            const dx = Math.abs(i - j);
+            const dy = Math.abs(
+                chromosomeGeneClone[i] - chromosomeGeneClone[j]
+            );
+            if (dx == dy) return 1;
+            return 0;
+        });
+    });
+    // filter out duplicates in gene because these represent row clashes
+    return uniq(chromosomeGeneClone).length - sum(flatten(diagonalClashes));
 }
 
 /**
