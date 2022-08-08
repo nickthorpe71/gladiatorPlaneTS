@@ -80,10 +80,9 @@ function crossover<T>(
     for (let i = 0; i < halfPopulationSize; i++) {
         const parentA: Chromosome<T> = populationClone[0][0];
         const parentB: Chromosome<T> = populationClone[0][1];
-        const child1: Chromosome<T> = crossoverFunction(parentA, parentB);
-        const child2: Chromosome<T> = crossoverFunction(parentA, parentB);
-        newPopulation.push(child1);
-        newPopulation.push(child2);
+        const children: Chromosome<T>[] = crossoverFunction(parentA, parentB);
+        newPopulation.push(children[0]);
+        newPopulation.push(children[1]);
         populationClone.splice(0, 1);
     }
     return newPopulation;
@@ -196,7 +195,7 @@ export interface FrameworkOptions<T> {
     crossoverFunction: (
         parentA: Chromosome<T>,
         parentB: Chromosome<T>
-    ) => Chromosome<T>;
+    ) => Chromosome<T>[];
     mutationFunction: (chromosome: Chromosome<T>) => Chromosome<T>;
     selectionFunction: (
         population: Chromosome<T>[],

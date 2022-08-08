@@ -42,16 +42,23 @@ function fitnessFunction(chromosome: Chromosome<[number, number]>): number {
 function crossoverFunction(
     parentA: Chromosome<[number, number]>,
     parentB: Chromosome<[number, number]>
-): Chromosome<[number, number]> {
-    const child: Chromosome<[number, number]> =
+): Chromosome<[number, number]>[] {
+    const child1: Chromosome<[number, number]> =
         cloneChromosome<[number, number]>(parentA);
-    child.fitness = 0;
-    child.age = 0;
+    child1.fitness = 0;
+    child1.age = 0;
+    const child2: Chromosome<[number, number]> =
+        cloneChromosome<[number, number]>(parentB);
+    child2.fitness = 0;
+    child2.age = 0;
     const crossoverPoint = Math.floor(Math.random() * parentA.size);
+
     for (let i = crossoverPoint; i < chromosomeLength; i++) {
-        child.genes[i] = parentB.genes[i];
+        child1.genes[i] = parentB.genes[i];
+        child2.genes[i] = parentA.genes[i];
     }
-    return child;
+
+    return [child1, child2];
 }
 
 /**
