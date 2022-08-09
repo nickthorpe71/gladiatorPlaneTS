@@ -12,7 +12,7 @@ function initialPopulation<T>(
     chromosome: Chromosome<T>,
     size: number
 ): Chromosome<T>[] {
-    return range(0, size - 1).map(() => chromosome);
+    return range(0, size).map(() => chromosome);
 }
 
 /**

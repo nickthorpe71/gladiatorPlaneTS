@@ -52,9 +52,28 @@ function orderOneCreateChildHelper<T>(
     return childGenes;
 }
 
-// TODO: once implemented it needs to be reapplied to all old problems
-function singlePoint() {}
+function singlePoint<T>(parent1: Chromosome<T>, parent2: Chromosome<T>) {
+    const crossoverPoint = random(parent1.size);
 
-export const crossoverStrategy = {
-    orderOne,
-};
+    const parent1FirstSection = parent1.genes.slice(0, crossoverPoint);
+    const parent1SecondSection = parent1.genes.slice(crossoverPoint);
+    const parent2FirstSection = parent2.genes.slice(0, crossoverPoint);
+    const parent2SecondSection = parent2.genes.slice(crossoverPoint);
+
+    const child1: Chromosome<T> = {
+        genes: parent1FirstSection.concat(parent2SecondSection),
+        size: parent1.size,
+        fitness: 0,
+        age: 0,
+    };
+    const child2: Chromosome<T> = {
+        genes: parent2FirstSection.concat(parent1SecondSection),
+        size: parent1.size,
+        fitness: 0,
+        age: 0,
+    };
+
+    return [child1, child2];
+}
+
+export const crossoverStrategy = { singlePoint, orderOne };

@@ -3,6 +3,7 @@ import Maeve, {
     FrameworkOptions,
     HyperParameters,
     selectionStrategy,
+    crossoverStrategy,
 } from "../../Maeve/gaFramework_v1";
 import Problem from "../../Maeve/types/Problem";
 import Chromosome, { cloneChromosome } from "../../Maeve/types/Chromosome";
@@ -44,29 +45,6 @@ function fitnessFunction(chromosome: Chromosome<string>): number {
 }
 
 /**
- * Crossover chromosome by randomly choosing a point to split the chromosome.
- */
-function crossoverFunction(
-    parentA: Chromosome<string>,
-    parentB: Chromosome<string>
-): Chromosome<string>[] {
-    const child1: Chromosome<string> = cloneChromosome<string>(parentA);
-    child1.fitness = 0;
-    child1.age = 0;
-    const child2: Chromosome<string> = cloneChromosome<string>(parentB);
-    child2.fitness = 0;
-    child2.age = 0;
-    const crossoverPoint = Math.floor(Math.random() * parentA.size);
-
-    for (let i = crossoverPoint; i < chromosomeLength; i++) {
-        child1.genes[i] = parentB.genes[i];
-        child2.genes[i] = parentA.genes[i];
-    }
-
-    return [child1, child2];
-}
-
-/**
  * Mutate chromosome by swapping a random letter from the gene with a random letter from the alphabet.
  */
 function mutationFunction(chromosome: Chromosome<string>): Chromosome<string> {
@@ -96,19 +74,17 @@ const problemDefinition: Problem<string> = {
 
 const hyperParams: HyperParameters = {
     populationSize: 2000,
-    mutationProbability: 0.25,
+    mutationProbability: 0.05,
     coolingRate: 0.99,
 };
 
 const frameworkOptions: FrameworkOptions<string> = {
     showLogStream: true,
     hyperParams,
-    crossoverFunction,
+    crossoverFunction: crossoverStrategy.singlePoint,
     mutationFunction,
     selectionFunction: selectionStrategy.elitism,
     selectionRate: 0.8,
 };
 
 Maeve(problemDefinition, frameworkOptions);
-
-// console.log(stringifyChromosome(genotype()));
