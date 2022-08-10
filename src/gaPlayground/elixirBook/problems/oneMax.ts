@@ -62,11 +62,8 @@ function mutationFunction(chromosome: Chromosome<number>): Chromosome<number> {
     return chromosomeClone;
 }
 
-function terminationCriteria(
-    chromosome: Chromosome<number>,
-    generation: number
-): boolean {
-    return chromosome.fitness > 900;
+function terminationCriteria(chromosome: Chromosome<number>): boolean {
+    return chromosome?.fitness === 1000;
 }
 
 const problemDefinition: Problem<number> = {
@@ -76,7 +73,7 @@ const problemDefinition: Problem<number> = {
 };
 
 const hyperParams: HyperParameters = {
-    populationSize: 3000,
+    populationSize: 1000,
     mutationProbability: 0.1,
     coolingRate: 1,
 };
@@ -84,9 +81,15 @@ const hyperParams: HyperParameters = {
 const frameworkOptions: FrameworkOptions<number> = {
     hyperParams,
     showLogStream: true,
-    crossoverFunction: crossoverStrategy.singlePoint,
+    crossoverFunction: (
+        parent1: Chromosome<number>,
+        parent2: Chromosome<number>
+    ) => crossoverStrategy.uniform(parent1, parent2, 0.5),
     mutationFunction,
-    selectionFunction: selectionStrategy.elitism,
+    selectionFunction: (
+        population: Chromosome<number>[],
+        selectionRate: number
+    ) => selectionStrategy.tournament(population, selectionRate, 10),
     selectionRate: 1,
 };
 

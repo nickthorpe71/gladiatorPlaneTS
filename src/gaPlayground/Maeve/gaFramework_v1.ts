@@ -192,10 +192,7 @@ export default async function run<T>(
 export interface FrameworkOptions<T> {
     showLogStream?: boolean;
     hyperParams: HyperParameters;
-    crossoverFunction: (
-        parentA: Chromosome<T>,
-        parentB: Chromosome<T>
-    ) => Chromosome<T>[];
+    crossoverFunction: Function;
     mutationFunction: (chromosome: Chromosome<T>) => Chromosome<T>;
     selectionFunction: (
         population: Chromosome<T>[],

@@ -6,6 +6,6 @@ export default interface Problem<T> {
     terminationCriteria: (
         bestFitness: Chromosome<T>,
         generation: number,
-        temperature?: number
+        temperature: number
     ) => boolean;
 }

@@ -63,7 +63,7 @@ function terminationCriteria(
     chromosome: Chromosome<string>,
     generation: number
 ): boolean {
-    return chromosome.fitness > 0.6 || generation > 3000;
+    return chromosome.fitness >= 0.95 || generation > 3000;
 }
 
 const problemDefinition: Problem<string> = {
@@ -74,17 +74,23 @@ const problemDefinition: Problem<string> = {
 
 const hyperParams: HyperParameters = {
     populationSize: 2000,
-    mutationProbability: 0.05,
-    coolingRate: 0.99,
+    mutationProbability: 0.15,
+    coolingRate: 0.9,
 };
 
 const frameworkOptions: FrameworkOptions<string> = {
     showLogStream: true,
     hyperParams,
-    crossoverFunction: crossoverStrategy.singlePoint,
+    crossoverFunction: (
+        parent1: Chromosome<string>,
+        parent2: Chromosome<string>
+    ) => crossoverStrategy.uniform(parent1, parent2, 0.5),
     mutationFunction,
-    selectionFunction: selectionStrategy.elitism,
-    selectionRate: 0.8,
+    selectionFunction: (
+        population: Chromosome<string>[],
+        selectionRate: number
+    ) => selectionStrategy.tournament(population, selectionRate, 100),
+    selectionRate: 0.4,
 };
 
 Maeve(problemDefinition, frameworkOptions);

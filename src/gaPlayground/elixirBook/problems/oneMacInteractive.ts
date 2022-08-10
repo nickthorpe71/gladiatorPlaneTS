@@ -64,11 +64,8 @@ function mutationFunction(chromosome: Chromosome<number>): Chromosome<number> {
     return chromosomeClone;
 }
 
-function terminationCriteria(
-    chromosome: Chromosome<number>,
-    generation: number
-): boolean {
-    return chromosome.fitness > 650;
+function terminationCriteria(bestFitness: Chromosome<number>): boolean {
+    return bestFitness.fitness > 650;
 }
 
 const problemDefinition: Problem<number> = {

@@ -22,7 +22,7 @@ function tournament<T>(
     numToSelect: number,
     tournamentSize: number
 ): Chromosome<T>[] {
-    return range(0, numToSelect - 1).map(() => {
+    return range(0, numToSelect).map(() => {
         const tournament: Chromosome<T>[] = shuffle<Chromosome<T>>(
             population
         ).slice(0, tournamentSize);
@@ -77,7 +77,7 @@ function roulette<T>(
         .map((chromosome) => chromosome.fitness)
         .reduce((acc, fitness) => acc + fitness, 0);
 
-    return range(0, numToSelect - 1).map(() => {
+    return range(0, numToSelect).map(() => {
         const random = Math.random() * sumFitness;
         let sum = 0;
         let result: Chromosome<T> = population[0];

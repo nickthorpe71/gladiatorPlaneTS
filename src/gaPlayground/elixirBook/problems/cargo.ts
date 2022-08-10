@@ -77,9 +77,10 @@ function mutationFunction(chromosome: Chromosome<number>): Chromosome<number> {
 
 function terminationCriteria(
     bestFitness: Chromosome<number>,
-    generation: number
+    generation: number,
+    temperature: number
 ): boolean {
-    return generation === 1000;
+    return temperature === 0;
 }
 
 const problemDefinition: Problem<number> = {
@@ -89,7 +90,7 @@ const problemDefinition: Problem<number> = {
 };
 
 const hyperParams: HyperParameters = {
-    populationSize: 1500,
+    populationSize: 200,
     mutationProbability: 0.05,
     coolingRate: 0.8,
 };
@@ -97,10 +98,16 @@ const hyperParams: HyperParameters = {
 const frameworkOptions: FrameworkOptions<number> = {
     showLogStream: true,
     hyperParams,
-    crossoverFunction: crossoverStrategy.singlePoint,
+    crossoverFunction: (
+        parent1: Chromosome<number>,
+        parent2: Chromosome<number>
+    ) => crossoverStrategy.uniform(parent1, parent2, 0.5),
     mutationFunction,
-    selectionFunction: selectionStrategy.elitism,
-    selectionRate: 0.8,
+    selectionFunction: (
+        population: Chromosome<number>[],
+        selectionRate: number
+    ) => selectionStrategy.tournament(population, selectionRate, 10),
+    selectionRate: 1,
 };
 
 async function getBestSolution() {

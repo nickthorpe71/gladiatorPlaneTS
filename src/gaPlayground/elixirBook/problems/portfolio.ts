@@ -68,8 +68,7 @@ function mutationFunction(
 }
 
 function terminationCriteria(
-    bestFitness: Chromosome<[number, number]>,
-    generation: number
+    bestFitness: Chromosome<[number, number]>
 ): boolean {
     return bestFitness.fitness === 180;
 }
@@ -81,18 +80,24 @@ const problemDefinition: Problem<[number, number]> = {
 };
 
 const hyperParams: HyperParameters = {
-    populationSize: 1500,
-    mutationProbability: 0.15,
-    coolingRate: 0.8,
+    populationSize: 500,
+    mutationProbability: 0.07,
+    coolingRate: 1,
 };
 
 const frameworkOptions: FrameworkOptions<[number, number]> = {
     showLogStream: true,
     hyperParams,
-    crossoverFunction: crossoverStrategy.singlePoint,
+    crossoverFunction: (
+        parent1: Chromosome<[number, number]>,
+        parent2: Chromosome<[number, number]>
+    ) => crossoverStrategy.uniform(parent1, parent2, 0.5),
     mutationFunction,
-    selectionFunction: selectionStrategy.elitism,
-    selectionRate: 0.8,
+    selectionFunction: (
+        population: Chromosome<[number, number]>[],
+        selectionRate: number
+    ) => selectionStrategy.tournament(population, selectionRate, 20),
+    selectionRate: 1,
 };
 
 Maeve(problemDefinition, frameworkOptions);
