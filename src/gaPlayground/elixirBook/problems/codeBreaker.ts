@@ -143,7 +143,7 @@ const frameworkOptions: FrameworkOptions<number> = {
     showLogStream: true,
     hyperParams,
     crossoverFunction: crossoverStrategy.singlePoint,
-    mutationFunction: mutationStrategy.randomShuffle,
+    mutationFunction: mutationStrategy.scramble,
     selectionFunction: selectionStrategy.elitism,
     selectionRate: 0.8,
 };
