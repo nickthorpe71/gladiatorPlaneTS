@@ -96,8 +96,7 @@ function mutation<T>(
     mutationFunction: Function,
     mutationProbability: number
 ): Chromosome<T>[] {
-    let populationClone = population.slice(); // for immutability
-    return populationClone.map((chromosome) =>
+    return population.map((chromosome) =>
         Math.random() < mutationProbability
             ? mutationFunction(chromosome)
             : chromosome
@@ -211,4 +210,5 @@ export interface HyperParameters {
 // exports
 export { selectionStrategy } from "./toolbox/selection";
 export { crossoverStrategy } from "./toolbox/crossover";
+export { mutationStrategy } from "./toolbox/mutation";
 export { genotype } from "./toolbox/genotype";

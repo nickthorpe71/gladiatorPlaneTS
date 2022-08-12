@@ -5,6 +5,7 @@ import Maeve, {
     genotype,
     selectionStrategy,
     crossoverStrategy,
+    mutationStrategy,
 } from "../../Maeve/gaFramework_v1";
 import Problem from "../../Maeve/types/Problem";
 import Chromosome, { cloneChromosome } from "../../Maeve/types/Chromosome";
@@ -120,30 +121,6 @@ function jaroDistance(s1: string, s2: string) {
     return (match / len1 + match / len2 + (match - t) / match) / 3.0;
 }
 
-function mutationFunction(chromosome: Chromosome<number>): Chromosome<number> {
-    const chromosomeClone: Chromosome<number> =
-        cloneChromosome<number>(chromosome);
-    let currentIndex = chromosomeClone.size;
-    let randomIndex;
-
-    // While there remain elements to shuffle.
-    while (currentIndex != 0) {
-        // Pick a remaining element.
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-
-        // And swap it with the current element.
-        [
-            chromosomeClone.genes[currentIndex],
-            chromosomeClone.genes[randomIndex],
-        ] = [
-            chromosomeClone.genes[randomIndex],
-            chromosomeClone.genes[currentIndex],
-        ];
-    }
-    return chromosomeClone;
-}
-
 function terminationCriteria(bestFitness: Chromosome<number>): boolean {
     return bestFitness.fitness === 1;
 }
@@ -166,7 +143,7 @@ const frameworkOptions: FrameworkOptions<number> = {
     showLogStream: true,
     hyperParams,
     crossoverFunction: crossoverStrategy.singlePoint,
-    mutationFunction,
+    mutationFunction: mutationStrategy.randomShuffle,
     selectionFunction: selectionStrategy.elitism,
     selectionRate: 0.8,
 };
