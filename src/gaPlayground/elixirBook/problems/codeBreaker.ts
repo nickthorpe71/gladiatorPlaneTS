@@ -171,4 +171,49 @@ const frameworkOptions: FrameworkOptions<number> = {
     selectionRate: 0.8,
 };
 
-Maeve(problemDefinition, frameworkOptions);
+async function main() {
+    const result = await Maeve(problemDefinition, frameworkOptions);
+
+    const encrypted = [
+        "1001100",
+        "1001001",
+        "1101010",
+        "1110011",
+        "1100000",
+        "1000010",
+        "1100000",
+        "1101011",
+        "1100000",
+        "1110001",
+        "1101100",
+        "1100110",
+        "1000100",
+        "1101001",
+        "1100010",
+        "1101010",
+        "1110111",
+        "1101100",
+        "1110001",
+        "1101101",
+        "1101000",
+        "1110110",
+    ];
+
+    const cipher = (encryptedWord: string[], key: string) =>
+        encryptedWord.map((bitChar: string) =>
+            bitChar
+                .split("")
+                .map((bit: string, i: number) => Number(bit) ^ Number(key[i]))
+                .join("")
+        );
+
+    const key = result.genes.toString();
+    const decrypted = cipher(encrypted, key)
+        .map((bitChar: string) =>
+            String.fromCharCode(Number(parseInt(bitChar, 2).toString(10)))
+        )
+        .join("");
+    console.log("decrypted:", decrypted);
+}
+
+main();
