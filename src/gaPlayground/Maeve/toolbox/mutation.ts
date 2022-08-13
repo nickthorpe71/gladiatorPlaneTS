@@ -1,5 +1,17 @@
 import Chromosome, { cloneChromosome } from "../types/Chromosome";
-import { shuffle, random } from "lodash";
+import { shuffle, sum, range } from "lodash";
+
+/**
+ * Shuffles all genes in a chromosome. Can apply to most genotypes and preserves the size and permutation of a chromosome.
+ * @param chromosome - chromosome to mutate
+ * @returns mutated chromosome
+ */
+function scramble<T>(chromosome: Chromosome<T>): Chromosome<T> {
+    const chromosomeClone: Chromosome<T> = cloneChromosome<T>(chromosome);
+    const newGenes = shuffle(chromosomeClone.genes);
+    chromosomeClone.genes = newGenes;
+    return chromosomeClone;
+}
 
 /**
  * Applies a bitwise XOR to all genes or with a specified probability (p) of genes in a chromosome. Simple and effective but only applies to binary genotypes.
@@ -22,19 +34,41 @@ function bitFlip(
     return chromosomeClone;
 }
 
-/**
- * Shuffles all genes in a chromosome. Can apply to most genotypes and preserves the size and permutation of a chromosome.
- * @param chromosome - chromosome to mutate
- * @returns mutated chromosome
- */
-function scramble<T>(chromosome: Chromosome<T>): Chromosome<T> {
-    const chromosomeClone: Chromosome<T> = cloneChromosome<T>(chromosome);
-    const newGenes = shuffle(chromosomeClone.genes);
+function gaussian(chromosome: Chromosome<number>): Chromosome<number> {
+    const chromosomeClone: Chromosome<number> =
+        cloneChromosome<number>(chromosome);
+    const mean = sum(chromosome.genes) / chromosome.genes.length;
+
+    const sigma =
+        sum(chromosome.genes.map((gene) => (mean - gene) ** 2)) /
+        chromosome.genes.length;
+
+    const newGenes = chromosome.genes.map((gene) => randomNormal(gene, sigma));
     chromosomeClone.genes = newGenes;
     return chromosomeClone;
+}
+function randomNormal(mean: number, variance: number) {
+    return (
+        sum(
+            range(0, 6).map(
+                (_) =>
+                    mean + Math.random() * variance + Math.random() * -variance
+            )
+        ) / 6
+    );
 }
 
 export const mutationStrategy = {
     scramble,
     bitFlip,
+    gaussian,
 };
+
+const testCH: Chromosome<number> = {
+    genes: [1.2, 2.3, 3.4, 4.5],
+    fitness: 0,
+    size: 4,
+    age: 0,
+};
+
+gaussian(testCH);
