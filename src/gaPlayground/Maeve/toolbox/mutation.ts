@@ -34,6 +34,11 @@ function bitFlip(
     return chromosomeClone;
 }
 
+/**
+ * Specifically meant mutation of real number genotype chromosomes. Generates gaussian random numbers based on the provided chromosome. The idea is that you can slightly adjust a chromosome without changing it too much.
+ * @param chromosome - chromosome to mutate
+ * @returns mutated chromosome
+ */
 function gaussian(chromosome: Chromosome<number>): Chromosome<number> {
     const chromosomeClone: Chromosome<number> =
         cloneChromosome<number>(chromosome);
