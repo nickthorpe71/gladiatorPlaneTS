@@ -1,9 +1,13 @@
 import { sleep, chunkEvery } from "../../utils/index";
-import { range } from "lodash";
+import { range, flatten } from "lodash";
 import logger from "../../utils/logger";
 
 import Problem from "./types/Problem";
 import Chromosome, { stringifyChromosome } from "./types/Chromosome";
+import { selectionStrategy } from "./toolbox/selection";
+import { crossoverStrategy } from "./toolbox/crossover";
+import { mutationStrategy } from "./toolbox/mutation";
+import { reinsertionStrategy } from "./toolbox/reinsertion";
 
 /**
  * Creates a random population of chromosomes.
@@ -47,7 +51,7 @@ function selection<T>(
     selectionFunction: (
         population: Chromosome<T>[],
         numToSelect: number
-    ) => Chromosome<T>[],
+    ) => Chromosome<T>[] = selectionStrategy.elitism,
     selectionRate: number
 ): { parents: Chromosome<T>[][]; leftovers: Chromosome<T>[] } {
     const populationSize = population.length;
@@ -72,7 +76,7 @@ function selection<T>(
  */
 function crossover<T>(
     matchedPopulation: Chromosome<T>[][],
-    crossoverFunction: Function
+    crossoverFunction: Function = crossoverStrategy.singlePoint
 ): Chromosome<T>[] {
     const halfPopulationSize = matchedPopulation.length;
     let populationClone = matchedPopulation.slice(); // for immutability
@@ -93,13 +97,30 @@ function crossover<T>(
  */
 function mutation<T>(
     population: Chromosome<T>[],
-    mutationFunction: Function,
+    mutationFunction: Function = mutationStrategy.scramble,
     mutationProbability: number
 ): Chromosome<T>[] {
-    return population.map((chromosome) =>
-        Math.random() < mutationProbability
-            ? mutationFunction(chromosome)
-            : chromosome
+    const numToMutate = Math.floor(mutationProbability * population.length);
+    return range(0, numToMutate).map((i) => mutationFunction(population[i]));
+}
+
+/**
+ * Reinsertion function for the population.
+ */
+function reinsertion<T>(
+    reinsertionFunction: Function = reinsertionStrategy.pure,
+    parents: Chromosome<T>[],
+    children: Chromosome<T>[],
+    mutants: Chromosome<T>[],
+    leftovers: Chromosome<T>[],
+    populationSize: number
+): Chromosome<T>[] {
+    return reinsertionFunction(
+        parents,
+        children,
+        mutants,
+        leftovers,
+        populationSize
     );
 }
 
@@ -113,7 +134,7 @@ async function evolve<T>(
     lastMaxFitness: number,
     temperature: number,
     options: FrameworkOptions<T>,
-    start: number
+    startTime: number
 ): Promise<Chromosome<T>> {
     const populationClone = population.slice(); // for immutability
     const evaluatedPopulation = evaluate<T>(
@@ -130,8 +151,10 @@ async function evolve<T>(
         logger.info(`Current best fitness is: ${bestFitness}`);
 
     if (problem.terminationCriteria(best, generation, newTemperature)) {
-        const stop = Date.now();
-        logger.info(`Time Taken to execute = ${(stop - start) / 1000} seconds`);
+        const endTime = Date.now();
+        logger.info(
+            `Time Taken to execute = ${(endTime - startTime) / 1000} seconds`
+        );
         logger.info(stringifyChromosome(best));
         return best;
     } else {
@@ -142,22 +165,29 @@ async function evolve<T>(
             options.selectionFunction,
             options.selectionRate
         );
-
         const children = crossover<T>(parents, options.crossoverFunction);
-        const newPopulation = children.concat(leftovers);
+        const mutants = mutation<T>(
+            populationClone,
+            options.mutationFunction,
+            options.hyperParams.mutationProbability
+        );
+        const newPopulation = reinsertion(
+            options.reinsertionFunction,
+            flatten(parents),
+            children,
+            mutants,
+            leftovers,
+            populationClone.length
+        );
 
         return evolve<T>(
-            mutation<T>(
-                newPopulation,
-                options.mutationFunction,
-                options.hyperParams.mutationProbability
-            ),
+            newPopulation,
             problem,
             generation + 1,
             bestFitness,
             newTemperature,
             options,
-            start
+            startTime
         );
     }
 }
@@ -191,14 +221,21 @@ export default async function run<T>(
 export interface FrameworkOptions<T> {
     showLogStream?: boolean;
     hyperParams: HyperParameters;
-    crossoverFunction: Function;
-    mutationFunction: (chromosome: Chromosome<T>) => Chromosome<T>;
-    selectionFunction: (
+    crossoverFunction?: Function;
+    mutationFunction?: (chromosome: Chromosome<T>) => Chromosome<T>;
+    selectionFunction?: (
         population: Chromosome<T>[],
         numToSelect: number,
         tournamentSize?: number
     ) => Chromosome<T>[];
     selectionRate: number;
+    reinsertionFunction?: (
+        parents: Chromosome<T>[],
+        children: Chromosome<T>[],
+        mutants: Chromosome<T>[],
+        leftovers: Chromosome<T>[],
+        populationSize: number
+    ) => Chromosome<T>[];
 }
 
 export interface HyperParameters {
@@ -211,4 +248,5 @@ export interface HyperParameters {
 export { selectionStrategy } from "./toolbox/selection";
 export { crossoverStrategy } from "./toolbox/crossover";
 export { mutationStrategy } from "./toolbox/mutation";
+export { reinsertionStrategy } from "./toolbox/reinsertion";
 export { genotype } from "./toolbox/genotype";
