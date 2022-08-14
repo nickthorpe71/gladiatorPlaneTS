@@ -1,6 +1,6 @@
 // JavaScript program to solve N Queen
 // Problem using backtracking
-const N = 8;
+const N = 24;
 
 function printSolution(board) {
     for (let i = 0; i < N; i++) {
@@ -71,16 +71,12 @@ function solveNQUtil(board, col) {
 // feasible solutions.
 function solveNQ() {
     const start = Date.now();
-    let board = [
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-    ];
+    let board = [];
+
+    for (let i = 0; i < N; i++) {
+        board[i] = [];
+        for (let j = 0; j < N; j++) board[i][j] = 0;
+    }
 
     if (solveNQUtil(board, 0) == false) {
         console.log("Solution does not exist");

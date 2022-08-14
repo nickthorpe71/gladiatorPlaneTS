@@ -4,7 +4,7 @@ import Maeve, {
     HyperParameters,
     selectionStrategy,
     crossoverStrategy,
-} from "../../Maeve/gaFramework_v1";
+} from "../../Maeve";
 import Problem from "../../Maeve/types/Problem";
 import Chromosome, { cloneChromosome } from "../../Maeve/types/Chromosome";
 const reader = require("readline-sync");

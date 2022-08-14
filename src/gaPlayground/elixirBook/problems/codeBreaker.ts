@@ -6,7 +6,7 @@ import Maeve, {
     selectionStrategy,
     crossoverStrategy,
     mutationStrategy,
-} from "../../Maeve/gaFramework_v1";
+} from "../../Maeve";
 import Problem from "../../Maeve/types/Problem";
 import Chromosome, { cloneChromosome } from "../../Maeve/types/Chromosome";
 

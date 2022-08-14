@@ -5,11 +5,12 @@ import Maeve, {
     genotype,
     selectionStrategy,
     crossoverStrategy,
-} from "../../Maeve/gaFramework_v1";
+    mutationStrategy,
+} from "../../Maeve";
 import Problem from "../../Maeve/types/Problem";
-import Chromosome, { cloneChromosome } from "../../Maeve/types/Chromosome";
+import Chromosome from "../../Maeve/types/Chromosome";
 
-const chromosomeLength = 8;
+const chromosomeLength = 24;
 
 /**
  * Determines the fitness of a chromosome. For N-Queens the fitness is calculated by checking how many queens are attacking each other.
@@ -32,36 +33,8 @@ function fitnessFunction(chromosome: Chromosome<number>): number {
     return uniq(chromosomeGeneClone).length - sum(flatten(diagonalClashes));
 }
 
-/**
- * Mutate chromosome by shuffling its bits. This preserves it's fitness.
- */
-function mutationFunction(chromosome: Chromosome<number>): Chromosome<number> {
-    const chromosomeClone: Chromosome<number> =
-        cloneChromosome<number>(chromosome);
-    let currentIndex = chromosomeClone.size;
-    let randomIndex;
-
-    // While there remain elements to shuffle.
-    while (currentIndex != 0) {
-        // Pick a remaining element.
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-
-        // And swap it with the current element.
-        [
-            chromosomeClone.genes[currentIndex],
-            chromosomeClone.genes[randomIndex],
-        ] = [
-            chromosomeClone.genes[randomIndex],
-            chromosomeClone.genes[currentIndex],
-        ];
-    }
-
-    return chromosomeClone;
-}
-
 function terminationCriteria(bestFitness: Chromosome<number>): boolean {
-    return bestFitness.fitness === 8;
+    return bestFitness.fitness === chromosomeLength;
 }
 
 const problemDefinition: Problem<number> = {
@@ -75,16 +48,20 @@ const problemDefinition: Problem<number> = {
 };
 
 const hyperParams: HyperParameters = {
-    populationSize: 100,
-    mutationProbability: 0.05,
+    populationSize: 1500,
+    mutationProbability: 0.15,
     coolingRate: 0.8,
 };
 
 const frameworkOptions: FrameworkOptions<number> = {
+    showLogStream: true,
     hyperParams,
     crossoverFunction: crossoverStrategy.orderOne,
-    mutationFunction,
-    selectionFunction: selectionStrategy.elitism,
+    mutationFunction: mutationStrategy.scramble,
+    selectionFunction: (
+        population: Chromosome<number>[],
+        selectionRate: number
+    ) => selectionStrategy.tournament(population, selectionRate, 30),
     selectionRate: 0.8,
 };
 
