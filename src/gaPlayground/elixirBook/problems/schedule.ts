@@ -5,6 +5,7 @@ import Maeve, {
     selectionStrategy,
     crossoverStrategy,
     mutationStrategy,
+    reinsertionStrategy,
 } from "../../Maeve";
 import { range, sum } from "lodash";
 import Problem from "../../Maeve/types/Problem";
@@ -67,6 +68,22 @@ const frameworkOptions: FrameworkOptions<number> = {
         selectionRate: number
     ) => selectionStrategy.tournament(population, selectionRate, 10),
     selectionRate: 0.8,
+    reinsertionFunction: (
+        parents: Chromosome<number>[],
+        children: Chromosome<number>[],
+        mutants: Chromosome<number>[],
+        leftovers: Chromosome<number>[],
+        populationSize: number,
+        survivalRate: number
+    ) =>
+        reinsertionStrategy.elitism(
+            parents,
+            children,
+            mutants,
+            leftovers,
+            populationSize,
+            survivalRate
+        ),
 };
 
 Maeve(problemDefinition, frameworkOptions);

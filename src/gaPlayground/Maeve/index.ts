@@ -8,6 +8,7 @@ import { selectionStrategy } from "./toolbox/selection";
 import { crossoverStrategy } from "./toolbox/crossover";
 import { mutationStrategy } from "./toolbox/mutation";
 import { reinsertionStrategy } from "./toolbox/reinsertion";
+import { number } from "yup";
 
 /**
  * Creates a random population of chromosomes.
@@ -163,7 +164,7 @@ async function evolve<T>(
         const { parents, leftovers } = selection<T>(
             populationClone,
             options.selectionFunction,
-            options.selectionRate
+            options.selectionRate || 1
         );
         const children = crossover<T>(parents, options.crossoverFunction);
         const mutants = mutation<T>(
@@ -228,14 +229,8 @@ export interface FrameworkOptions<T> {
         numToSelect: number,
         tournamentSize?: number
     ) => Chromosome<T>[];
-    selectionRate: number;
-    reinsertionFunction?: (
-        parents: Chromosome<T>[],
-        children: Chromosome<T>[],
-        mutants: Chromosome<T>[],
-        leftovers: Chromosome<T>[],
-        populationSize: number
-    ) => Chromosome<T>[];
+    selectionRate?: number;
+    reinsertionFunction?: Function;
 }
 
 export interface HyperParameters {

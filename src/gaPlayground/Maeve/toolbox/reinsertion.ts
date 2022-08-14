@@ -1,5 +1,5 @@
 import Chromosome from "../types/Chromosome";
-import { random, range } from "lodash";
+import { random, range, shuffle } from "lodash";
 
 function pure<T>(
     _parents: Chromosome<T>[],
@@ -8,14 +8,52 @@ function pure<T>(
     _leftovers: Chromosome<T>[],
     populationSize: number
 ): Chromosome<T>[] {
-    return preservePopulationSize(
+    return fitToPopulationSize(
         children.concat(mutants),
         children,
         populationSize
     );
 }
 
-function preservePopulationSize<T>(
+function elitism<T>(
+    parents: Chromosome<T>[],
+    children: Chromosome<T>[],
+    mutants: Chromosome<T>[],
+    leftovers: Chromosome<T>[],
+    populationSize: number,
+    survivalRate: number,
+    preservePopulationSize: boolean = false
+): Chromosome<T>[] {
+    const old = parents.concat(leftovers);
+    const numSurvivors = Math.floor(populationSize * survivalRate);
+    const survivors = old
+        .sort((a, b) => a.fitness - b.fitness)
+        .slice(0, numSurvivors);
+    const newPopulation = survivors.concat(children).concat(mutants);
+    return preservePopulationSize
+        ? fitToPopulationSize(newPopulation, survivors, populationSize)
+        : newPopulation;
+}
+
+function uniform<T>(
+    parents: Chromosome<T>[],
+    children: Chromosome<T>[],
+    mutants: Chromosome<T>[],
+    leftovers: Chromosome<T>[],
+    populationSize: number,
+    survivalRate: number,
+    preservePopulationSize: boolean = false
+): Chromosome<T>[] {
+    const old = parents.concat(leftovers);
+    const numSurvivors = Math.floor(populationSize * survivalRate);
+    const survivors = shuffle(old).slice(0, numSurvivors);
+    const newPopulation = survivors.concat(children).concat(mutants);
+    return preservePopulationSize
+        ? fitToPopulationSize(newPopulation, survivors, populationSize)
+        : newPopulation;
+}
+
+function fitToPopulationSize<T>(
     population: Chromosome<T>[],
     fillWith: Chromosome<T>[],
     populationSize: number
@@ -23,7 +61,7 @@ function preservePopulationSize<T>(
     const numToAdjustBy: number = populationSize - population.length;
 
     if (numToAdjustBy === 0) return population;
-    if (numToAdjustBy < 0) return population.slice(0, populationSize);
+    if (numToAdjustBy < 0) return shuffle(population).slice(0, populationSize);
 
     return population.concat(
         range(0, numToAdjustBy).map(
@@ -34,4 +72,6 @@ function preservePopulationSize<T>(
 
 export const reinsertionStrategy = {
     pure,
+    elitism,
+    uniform,
 };
