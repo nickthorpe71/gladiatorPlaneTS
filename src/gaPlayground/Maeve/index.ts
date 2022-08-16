@@ -2,13 +2,18 @@ import { sleep, chunkEvery } from "../../utils/index";
 import { range, flatten } from "lodash";
 import logger from "../../utils/logger";
 
-import Problem from "./types/Problem";
-import Chromosome, { stringifyChromosome } from "./types/Chromosome";
+import Problem from "./modules/Problem";
+import Chromosome, { stringifyChromosome } from "./modules/Chromosome";
+
 import { selectionStrategy } from "./toolbox/selection";
 import { crossoverStrategy } from "./toolbox/crossover";
 import { mutationStrategy } from "./toolbox/mutation";
 import { reinsertionStrategy } from "./toolbox/reinsertion";
-import { number } from "yup";
+
+import StatsCache, { IStatsCache, IStatsEntry } from "./services/statsCache";
+
+// Statistics cache for keeping track generational statistics.
+export const statsCache: IStatsCache = StatsCache.createCache();
 
 /**
  * Creates a random population of chromosomes.

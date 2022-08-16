@@ -8,8 +8,8 @@ import Maeve, {
     reinsertionStrategy,
 } from "../../Maeve";
 import { range, sum } from "lodash";
-import Problem from "../../Maeve/types/Problem";
-import Chromosome from "../../Maeve/types/Chromosome";
+import Problem from "../../Maeve/modules/Problem";
+import Chromosome from "../../Maeve/modules/Chromosome";
 
 const chromosomeLength = 10;
 

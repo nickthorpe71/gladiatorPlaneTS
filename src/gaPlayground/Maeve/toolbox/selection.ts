@@ -1,4 +1,4 @@
-import Chromosome from "../types/Chromosome";
+import Chromosome from "../modules/Chromosome";
 import { shuffle } from "lodash";
 import { maxBy, range } from "lodash";
 

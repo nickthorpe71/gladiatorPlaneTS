@@ -5,8 +5,8 @@ import Maeve, {
     selectionStrategy,
     crossoverStrategy,
 } from "../../Maeve";
-import Problem from "../../Maeve/types/Problem";
-import Chromosome, { cloneChromosome } from "../../Maeve/types/Chromosome";
+import Problem from "../../Maeve/modules/Problem";
+import Chromosome, { cloneChromosome } from "../../Maeve/modules/Chromosome";
 
 const chromosomeLength = 10;
 

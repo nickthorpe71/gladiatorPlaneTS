@@ -1,4 +1,4 @@
-import Chromosome, { cloneChromosome } from "../types/Chromosome";
+import Chromosome, { cloneChromosome } from "../modules/Chromosome";
 import { shuffle, sum, range } from "lodash";
 
 /**

@@ -1,4 +1,4 @@
-import Chromosome from "../types/Chromosome";
+import Chromosome from "../modules/Chromosome";
 import { random, range, shuffle } from "lodash";
 
 function pure<T>(

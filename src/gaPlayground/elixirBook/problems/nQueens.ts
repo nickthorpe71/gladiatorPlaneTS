@@ -7,8 +7,8 @@ import Maeve, {
     crossoverStrategy,
     mutationStrategy,
 } from "../../Maeve";
-import Problem from "../../Maeve/types/Problem";
-import Chromosome from "../../Maeve/types/Chromosome";
+import Problem from "../../Maeve/modules/Problem";
+import Chromosome from "../../Maeve/modules/Chromosome";
 
 const chromosomeLength = 24;
 
