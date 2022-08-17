@@ -10,11 +10,11 @@ export function createCache(): IStatsCache {
     return {};
 }
 
-export function getCacheRecord(cache: IStatsCache, key: string): IStatsEntry {
+export function get(cache: IStatsCache, key: string): IStatsEntry {
     return cache[key];
 }
 
-export function setCacheRecord(
+export function insert(
     cache: IStatsCache,
     key: string,
     value: IStatsEntry
@@ -26,6 +26,6 @@ export function setCacheRecord(
 
 export default {
     createCache,
-    getCacheRecord,
-    setCacheRecord,
+    get,
+    insert,
 };

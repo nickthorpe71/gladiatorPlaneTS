@@ -1,4 +1,5 @@
 import { range } from "../../../utils/index";
+import { take } from "lodash";
 import Maeve, {
     FrameworkOptions,
     HyperParameters,
@@ -110,15 +111,15 @@ const frameworkOptions: FrameworkOptions<number> = {
     selectionRate: 1,
 };
 
-async function getBestSolution() {
-    const bestSolution = await Maeve(problemDefinition, frameworkOptions);
+async function main() {
+    const result = await Maeve(problemDefinition, frameworkOptions);
     const cargoWeights = [10, 6, 8, 7, 10, 9, 7, 11, 6, 8];
+    const bestSolution: Chromosome<number> = result.best as Chromosome<number>;
     const totalCargoWeight = bestSolution.genes
         .map((gene, index) => gene * cargoWeights[index])
         .reduce((acc, curr) => acc + curr, 0);
     console.log("Weight is:", totalCargoWeight);
+    console.log("Stats:", take(Object.entries(result.stats), 10));
 }
 
-getBestSolution();
-
-Maeve(problemDefinition, frameworkOptions);
+main();

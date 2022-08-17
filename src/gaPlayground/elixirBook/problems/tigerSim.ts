@@ -89,4 +89,9 @@ const frameworkOptions: FrameworkOptions<number> = {
         ),
 };
 
-Maeve(problemDefinition, frameworkOptions);
+async function main(): Promise<void> {
+    const result = await Maeve(problemDefinition, frameworkOptions);
+    console.log(result.stats);
+}
+
+main();

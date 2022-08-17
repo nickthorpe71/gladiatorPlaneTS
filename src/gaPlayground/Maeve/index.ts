@@ -13,7 +13,20 @@ import { reinsertionStrategy } from "./toolbox/reinsertion";
 import StatsCache, { IStatsCache, IStatsEntry } from "./services/statsCache";
 
 // Statistics cache for keeping track generational statistics.
-export const statsCache: IStatsCache = StatsCache.createCache();
+function updateStats<T>(
+    statsCache: IStatsCache,
+    population: Chromosome<T>[],
+    generation: number
+) {
+    const stats: IStatsEntry = {
+        best: population[0],
+        worst: population[population.length - 1],
+        average:
+            population.reduce((acc, curr) => acc + curr.fitness, 0) /
+            population.length,
+    };
+    return StatsCache.insert(statsCache, `gen_${generation}`, stats);
+}
 
 /**
  * Creates a random population of chromosomes.
@@ -140,12 +153,18 @@ async function evolve<T>(
     lastMaxFitness: number,
     temperature: number,
     options: FrameworkOptions<T>,
-    startTime: number
-): Promise<Chromosome<T>> {
+    startTime: number,
+    statsCache: IStatsCache
+): Promise<{ [key: string]: Chromosome<T> | IStatsCache }> {
     const populationClone = population.slice(); // for immutability
     const evaluatedPopulation = evaluate<T>(
         populationClone,
         problem.fitnessFunction
+    );
+    const updatesStats: IStatsCache = updateStats(
+        statsCache,
+        evaluatedPopulation,
+        generation
     );
     const best = evaluatedPopulation[0];
     const bestFitness = problem.fitnessFunction(best);
@@ -162,7 +181,7 @@ async function evolve<T>(
             `Time Taken to execute = ${(endTime - startTime) / 1000} seconds`
         );
         logger.info(stringifyChromosome(best));
-        return best;
+        return { best: best, stats: updatesStats };
     } else {
         await sleep(0.001); // sleep 1 microsecond to give JS heap time to reallocate memory / prevent max call stack error
 
@@ -193,7 +212,8 @@ async function evolve<T>(
             bestFitness,
             newTemperature,
             options,
-            startTime
+            startTime,
+            updatesStats
         );
     }
 }
@@ -204,12 +224,13 @@ async function evolve<T>(
 export default async function run<T>(
     problem: Problem<T>,
     options: FrameworkOptions<T>
-): Promise<Chromosome<T>> {
+): Promise<{ [key: string]: Chromosome<T> | IStatsCache }> {
     const startTime = Date.now();
     const population = initialPopulation<T>(
         problem.genotype(),
         options.hyperParams.populationSize
     );
+    const statsCache: IStatsCache = StatsCache.createCache();
     const generation = 0;
     const lastMaxFitness = 0;
     const temperature = 0;
@@ -220,7 +241,8 @@ export default async function run<T>(
         lastMaxFitness,
         temperature,
         options,
-        startTime
+        startTime,
+        statsCache
     );
 }
 
