@@ -29,7 +29,7 @@ function terminationCriteria(
     _: Chromosome<number>,
     generation: number
 ): boolean {
-    return generation >= 1000;
+    return generation >= 500;
 }
 
 const problemDefinition: Problem<number> = {
