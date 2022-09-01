@@ -6,10 +6,10 @@ import Maeve, {
     crossoverStrategy,
     mutationStrategy,
     reinsertionStrategy,
-} from "../../Maeve";
+    Chromosome,
+    Problem,
+} from "maeve";
 import { range, sum } from "lodash";
-import Problem from "../../Maeve/modules/Problem";
-import Chromosome from "../../Maeve/modules/Chromosome";
 
 // score breakdown by index
 // 0: size

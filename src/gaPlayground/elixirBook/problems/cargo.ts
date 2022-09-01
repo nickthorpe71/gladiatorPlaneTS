@@ -1,91 +1,39 @@
-import { range } from "../../../utils/index";
-import { take } from "lodash";
 import Maeve, {
     FrameworkOptions,
     HyperParameters,
+    genotype,
     selectionStrategy,
     crossoverStrategy,
-} from "../../Maeve";
-import Problem from "../../Maeve/modules/Problem";
-import Chromosome, { cloneChromosome } from "../../Maeve/modules/Chromosome";
+    mutationStrategy,
+    Chromosome,
+    Problem,
+} from "maeve";
 
-const chromosomeLength = 10;
+const itemValues = [6, 5, 8, 9, 6, 7, 3, 1, 2, 6];
+const itemWeights = [10, 6, 8, 7, 10, 9, 7, 11, 6, 8];
+const weightLimit = 40;
 
-/**
- * Creates a random chromosome. This is a random binary string of length chromosomeLength.
- */
-function randomChromosome(): Chromosome<number> {
-    const newChromosome: Chromosome<number> = {
-        genes: range(1, chromosomeLength).map(() =>
-            Math.random() < 0.5 ? 0 : 1
-        ),
-        size: chromosomeLength,
-        fitness: 0,
-        age: 0,
-    };
-
-    return newChromosome;
-}
-
-/**
- * Determines the fitness of a chromosome. In this case, the fitness is the total profit of the cargo.
- */
 function fitnessFunction(chromosome: Chromosome<number>): number {
-    const chromosomeGeneClone = chromosome.genes.slice(); // for immutability
-
-    const cargoProfits = [6, 5, 8, 9, 6, 7, 3, 1, 2, 6];
-    const cargoWeights = [10, 6, 8, 7, 10, 9, 7, 11, 6, 8];
-    const weightLimit = 40;
-
-    const totalCargoProfit = chromosomeGeneClone
-        .map((gene, i) => cargoProfits[i] * gene)
+    const totalCargoProfit = chromosome.genes
+        .map((gene, i) => itemValues[i] * gene)
         .reduce((acc, curr) => acc + curr, 0);
 
-    const totalCargoWeight = chromosomeGeneClone
-        .map((gene, index) => gene * cargoWeights[index])
+    const totalCargoWeight = chromosome.genes
+        .map((gene, index) => gene * itemWeights[index])
         .reduce((acc, curr) => acc + curr, 0);
 
     return totalCargoWeight > weightLimit ? 0 : totalCargoProfit;
 }
 
-/**
- * Mutate chromosome by shuffling its bits. This preserves it's fitness.
- */
-function mutationFunction(chromosome: Chromosome<number>): Chromosome<number> {
-    const chromosomeClone: Chromosome<number> =
-        cloneChromosome<number>(chromosome);
-    let currentIndex = chromosomeClone.size;
-    let randomIndex;
-
-    // While there remain elements to shuffle.
-    while (currentIndex != 0) {
-        // Pick a remaining element.
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-
-        // And swap it with the current element.
-        [
-            chromosomeClone.genes[currentIndex],
-            chromosomeClone.genes[randomIndex],
-        ] = [
-            chromosomeClone.genes[randomIndex],
-            chromosomeClone.genes[currentIndex],
-        ];
-    }
-
-    return chromosomeClone;
-}
-
 function terminationCriteria(
-    bestFitness: Chromosome<number>,
-    generation: number,
-    temperature: number
+    _: Chromosome<number>,
+    generation: number
 ): boolean {
-    return temperature === 0;
+    return generation >= 1000;
 }
 
 const problemDefinition: Problem<number> = {
-    genotype: randomChromosome,
+    genotype: () => genotype.binary(10),
     fitnessFunction,
     terminationCriteria,
 };
@@ -93,33 +41,34 @@ const problemDefinition: Problem<number> = {
 const hyperParams: HyperParameters = {
     populationSize: 200,
     mutationProbability: 0.05,
-    coolingRate: 0.8,
 };
 
-const frameworkOptions: FrameworkOptions<number> = {
+// In options we can specify which strategies we want to use
+// for each step in our genetic algorithm.
+const options: FrameworkOptions<number> = {
     showLogStream: true,
     hyperParams,
     crossoverFunction: (
         parent1: Chromosome<number>,
         parent2: Chromosome<number>
     ) => crossoverStrategy.uniform(parent1, parent2, 0.5),
-    mutationFunction,
+    mutationFunction: mutationStrategy.scramble,
     selectionFunction: (
         population: Chromosome<number>[],
         selectionRate: number
     ) => selectionStrategy.tournament(population, selectionRate, 10),
-    selectionRate: 1,
+    selectionRate: 0.8,
 };
 
 async function main() {
-    const result = await Maeve(problemDefinition, frameworkOptions);
+    const result = await Maeve(problemDefinition, options);
     const cargoWeights = [10, 6, 8, 7, 10, 9, 7, 11, 6, 8];
     const bestSolution: Chromosome<number> = result.best as Chromosome<number>;
     const totalCargoWeight = bestSolution.genes
         .map((gene, index) => gene * cargoWeights[index])
         .reduce((acc, curr) => acc + curr, 0);
     console.log("Weight is:", totalCargoWeight);
-    console.log("Stats:", take(Object.entries(result.stats), 10));
+    console.log("Stats:", Object.entries(result.stats).slice(0, 10));
 }
 
 main();
