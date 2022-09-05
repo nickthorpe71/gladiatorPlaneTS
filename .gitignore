@@ -26,6 +26,9 @@ node_modules/
 .idea
 .eslintcache
 
+# Data
+testData
+
 # dotenv environment variable files
 .env
 .env.development.local
